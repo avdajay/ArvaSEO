@@ -1,0 +1,14 @@
+.idea/
+target/
+*.iml
+
+node_modules/
+.DS_Store
+*.pem
+*.zip
+
+vendor/
+
+.env
+
+.vscode
