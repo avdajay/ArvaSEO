@@ -62,45 +62,13 @@ class AdminEnqueue {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles(): void {
+    public function enqueue_styles(): void {
+        wp_enqueue_style( $this->plugin_name, ARVA_SEO_URL . 'assets/css/arva-seo.css', array(), $this->version, 'all' );
+        wp_enqueue_style( $this->plugin_name . '-custom', ARVA_SEO_URL . 'assets/css/custom-styles.css', array(), $this->version, 'all' );
+    }
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Arva_Seo_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Arva_Seo_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/arva-seo.css', array(), $this->version, 'all' );
-
-	}
-
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_scripts(): void {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Arva_Seo_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Arva_Seo_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/arva-seo.js', array( 'jquery' ), $this->version, false );
-
-	}
+    public function enqueue_scripts(): void {
+        wp_enqueue_script( $this->plugin_name, ARVA_SEO_URL . 'assets/js/arva-seo.js', array( 'jquery' ), $this->version, false );
+    }
 
 }

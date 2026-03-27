@@ -36,6 +36,7 @@ class Activator {
 	public static function activate(): void
 	{
         self::check_seo_plugins();
+		self::add_admin_body_class();
 	}
 
     public static function check_seo_plugins(): bool {
