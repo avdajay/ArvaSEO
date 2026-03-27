@@ -3,6 +3,7 @@
 namespace ArvaSeo\Core;
 
 use ArvaSeo\Admin\AdminEnqueue;
+use ArvaSeo\Admin\Notices;
 use ArvaSeo\Admin\SetupPages;
 
 /**
@@ -71,7 +72,8 @@ class Bootstrap {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		if ( defined( 'ARVA_SEO_VERSION' ) ) {
 			$this->version = ARVA_SEO_VERSION;
 		} else {
@@ -82,7 +84,6 @@ class Bootstrap {
 		$this->init_hooks();
 		$this->set_locale();
 		$this->load_hooks();
-
 	}
 
 	/**
@@ -101,10 +102,9 @@ class Bootstrap {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function init_hooks(): void {
-
+	private function init_hooks(): void
+	{
 		$this->loader = new Hooks();
-
 	}
 
 	/**
@@ -116,12 +116,11 @@ class Bootstrap {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale(): void {
-
+	private function set_locale(): void
+	{
 		$plugin_i18n = new Internationalization();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
 	}
 
 	/**
@@ -131,15 +130,16 @@ class Bootstrap {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_hooks(): void {
-
+	private function load_hooks(): void
+	{
 		$admin_enqueue = new AdminEnqueue( $this->get_plugin_name(), $this->get_version() );
 		$setup_pages = new SetupPages( $this->get_plugin_name(), $this->get_version() );
+		$notices = new Notices();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin_enqueue, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin_enqueue, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $setup_pages, 'add_admin_menu' );
-
+		$this->loader->add_action( 'admin_notices', $notices, 'no_seo_plugin_notice' );
 	}
 
 	/**
@@ -147,7 +147,8 @@ class Bootstrap {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run(): void {
+	public function run(): void
+	{
 		$this->loader->run();
 	}
 
@@ -158,7 +159,8 @@ class Bootstrap {
 	 * @return    string    The name of the plugin.
 	 * @since     1.0.0
 	 */
-	public function get_plugin_name(): string {
+	public function get_plugin_name(): string
+	{
 		return $this->plugin_name;
 	}
 
@@ -168,7 +170,8 @@ class Bootstrap {
 	 * @return    Hooks    Orchestrates the hooks of the plugin.
 	 * @since     1.0.0
 	 */
-	public function get_loader(): Hooks {
+	public function get_loader(): Hooks
+	{
 		return $this->loader;
 	}
 
@@ -178,7 +181,8 @@ class Bootstrap {
 	 * @return    string    The version number of the plugin.
 	 * @since     1.0.0
 	 */
-	public function get_version(): string {
+	public function get_version(): string
+	{
 		return $this->version;
 	}
 

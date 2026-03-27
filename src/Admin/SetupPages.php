@@ -2,6 +2,8 @@
 
 namespace ArvaSeo\Admin;
 
+use ArvaSeo\Helpers\View;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -15,7 +17,7 @@ namespace ArvaSeo\Admin;
 /**
  * The admin-specific functionality of the plugin.
  *
- * Defines the plugin name, version, and two examples hooks for how to
+ * Defines the plugin name, version, and two example hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
  * @package    Arva_Seo
@@ -62,7 +64,7 @@ class SetupPages {
 	 *
 	 * @since    1.0.0
 	 */
-	public function add_admin_menu() {
+	public function add_admin_menu(): void {
 		add_menu_page(
 			'Arva SEO',
 			'Arva SEO',
@@ -110,16 +112,16 @@ class SetupPages {
 		);
 	}
 
-	public function arva_seo_page() {
-		require_once plugin_dir_path( __FILE__ ) . 'views/arva-seo-admin-display.php';
+	public function arva_seo_page(): null {
+		return View::render( 'admin.dashboard' );
 	}
 
-	public function arva_seo_settings_page() {
-		require_once plugin_dir_path( __FILE__ ) . 'views/arva-seo-settings-display.php';
+	public function arva_seo_settings_page(): null {
+		return View::render( 'admin.settings' );
 	}
 
-	public function arva_seo_crawl_page() {
-		require_once plugin_dir_path( __FILE__ ) . 'views/arva-seo-analytics-display.php';
+	public function arva_seo_crawl_page(): null {
+		return View::render( 'admin.crawl' );
 	}
 
 }

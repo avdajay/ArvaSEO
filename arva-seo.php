@@ -36,6 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 define( 'ARVA_SEO_VERSION', '1.0.0' );
+define( 'ARVA_SEO_PATH', plugin_dir_path( __FILE__ ) );
 
 /**
  * Let's load all libraries and files needed for the plugin to work via autoloader.

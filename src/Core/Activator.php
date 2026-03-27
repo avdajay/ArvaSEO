@@ -33,17 +33,21 @@ class Activator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate(): void {
-
-	}
-
-	public function check_seo_plugins()
+	public static function activate(): void
 	{
-		$active_seo_plugin = new SeoPluginChecker();
-
-		if ( $active_seo_plugin->check() ) {
-			return true;
-		}
+        self::check_seo_plugins();
 	}
+
+    public static function check_seo_plugins(): bool {
+        $active_seo_plugin = new SeoPluginChecker();
+
+        if ( $active_seo_plugin->check() ) {
+            return true;
+        }
+
+        update_option( 'arva_seo_no_seo_plugin_notice', true );
+
+        return false;
+    }
 
 }
