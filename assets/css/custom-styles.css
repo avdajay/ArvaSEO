@@ -1,3 +1,14 @@
 body.toplevel_page_arva-seo #wpcontent {
     padding-left: 0 !important;
 }
+
+body.toplevel_page_arva-seo h1 {
+    margin: 0;
+}
+
+.arva-seo-container {
+    font-family: 'Inter', sans-serif !important;
+    padding: 30px;
+    height: 100vh;
+    background: #ffffff;
+}
