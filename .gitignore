@@ -1,14 +1,10 @@
 .idea/
 target/
-*.iml
-
 node_modules/
+vendor/
 .DS_Store
 *.pem
 *.zip
-
-vendor/
-
+*.iml
 .env
-
 .vscode

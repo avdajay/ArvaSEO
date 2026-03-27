@@ -1,5 +1,7 @@
 <?php
 
+namespace ArvaSeo\Core;
+
 /**
  * Fired during plugin deactivation
  *
@@ -20,7 +22,7 @@
  * @subpackage Arva_Seo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
  */
-class Arva_Seo_Deactivator {
+class Deactivator {
 
 	/**
 	 * Short Description. (use period)

@@ -1,5 +1,7 @@
 <?php
 
+namespace ArvaSeo\Core;
+
 /**
  * Define the internationalization functionality
  *
@@ -24,7 +26,7 @@
  * @subpackage Arva_Seo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
  */
-class Arva_Seo_i18n {
+class Internationalization {
 
 
 	/**

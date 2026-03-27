@@ -38,12 +38,22 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'ARVA_SEO_VERSION', '1.0.0' );
 
 /**
+ * Let's load all libraries and files needed for the plugin to work via autoloader.
+ */
+require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
+
+use ArvaSeo\Core\Activator;
+use ArvaSeo\Core\Deactivator;
+use ArvaSeo\Core\Bootstrap;
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-arva-seo-activator.php
  */
 function activate_arva_seo() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-arva-seo-activator.php';
-	Arva_Seo_Activator::activate();
+
+	Activator::activate();
+
 }
 
 /**
@@ -51,18 +61,11 @@ function activate_arva_seo() {
  * This action is documented in includes/class-arva-seo-deactivator.php
  */
 function deactivate_arva_seo() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-arva-seo-deactivator.php';
-	Arva_Seo_Deactivator::deactivate();
+	Deactivator::deactivate();
 }
 
 register_activation_hook( __FILE__, 'activate_arva_seo' );
 register_deactivation_hook( __FILE__, 'deactivate_arva_seo' );
-
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require plugin_dir_path( __FILE__ ) . 'includes/class-arva-seo.php';
 
 /**
  * Begins execution of the plugin.
@@ -75,7 +78,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-arva-seo.php';
  */
 function run_arva_seo() {
 
-	$plugin = new Arva_Seo();
+	$plugin = new Bootstrap();
 	$plugin->run();
 
 }

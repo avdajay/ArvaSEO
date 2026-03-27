@@ -1,0 +1,17 @@
+{
+    "name": "dajaydigital/arva-seo",
+    "description": "Your Ultimate SEO Assistant. Created for SEO Specialist who do site audits and assist them with the process making SEO fixes more fun and easy!",
+    "license": "GPL-2.0+",
+    "autoload": {
+        "psr-4": {
+            "ArvaSeo\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Aries Vincent Dajay",
+            "email": "avdajay@gmail.com"
+        }
+    ],
+    "require": {}
+}

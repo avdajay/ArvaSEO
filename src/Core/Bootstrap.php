@@ -1,5 +1,10 @@
 <?php
 
+namespace ArvaSeo\Core;
+
+use ArvaSeo\Admin\AdminEnqueue;
+use ArvaSeo\Admin\SetupPages;
+
 /**
  * The file that defines the core plugin class
  *
@@ -27,7 +32,7 @@
  * @subpackage Arva_Seo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
  */
-class Arva_Seo {
+class Bootstrap {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -35,27 +40,27 @@ class Arva_Seo {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Arva_Seo_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Hooks $loader Maintains and registers all hooks for the plugin.
 	 */
-	protected $loader;
+	protected Hooks $loader;
 
 	/**
 	 * The unique identifier of this plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+	 * @var      string $plugin_name The string used to uniquely identify this plugin.
 	 */
-	protected $plugin_name;
+	protected string $plugin_name;
 
 	/**
 	 * The current version of the plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $version    The current version of the plugin.
+	 * @var      string $version The current version of the plugin.
 	 */
-	protected $version;
+	protected string $version;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -74,10 +79,9 @@ class Arva_Seo {
 		}
 		$this->plugin_name = 'arva-seo';
 
-		$this->load_dependencies();
+		$this->init_hooks();
 		$this->set_locale();
-		$this->define_admin_hooks();
-		$this->define_public_hooks();
+		$this->load_hooks();
 
 	}
 
@@ -97,32 +101,9 @@ class Arva_Seo {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function init_hooks(): void {
 
-		/**
-		 * The class responsible for orchestrating the actions and filters of the
-		 * core plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-arva-seo-loader.php';
-
-		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-arva-seo-i18n.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the admin area.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-arva-seo-admin.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-arva-seo-public.php';
-
-		$this->loader = new Arva_Seo_Loader();
+		$this->loader = new Hooks();
 
 	}
 
@@ -135,9 +116,9 @@ class Arva_Seo {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() {
+	private function set_locale(): void {
 
-		$plugin_i18n = new Arva_Seo_i18n();
+		$plugin_i18n = new Internationalization();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 
@@ -150,28 +131,14 @@ class Arva_Seo {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function load_hooks(): void {
 
-		$plugin_admin = new Arva_Seo_Admin( $this->get_plugin_name(), $this->get_version() );
+		$admin_enqueue = new AdminEnqueue( $this->get_plugin_name(), $this->get_version() );
+		$setup_pages = new SetupPages( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-
-	}
-
-	/**
-	 * Register all of the hooks related to the public-facing functionality
-	 * of the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function define_public_hooks() {
-
-		$plugin_public = new Arva_Seo_Public( $this->get_plugin_name(), $this->get_version() );
-
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $admin_enqueue, 'enqueue_styles' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $admin_enqueue, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_menu', $setup_pages, 'add_admin_menu' );
 
 	}
 
@@ -180,7 +147,7 @@ class Arva_Seo {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() {
+	public function run(): void {
 		$this->loader->run();
 	}
 
@@ -188,30 +155,30 @@ class Arva_Seo {
 	 * The name of the plugin used to uniquely identify it within the context of
 	 * WordPress and to define internationalization functionality.
 	 *
-	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
+	 * @since     1.0.0
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name(): string {
 		return $this->plugin_name;
 	}
 
 	/**
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
+	 * @return    Hooks    Orchestrates the hooks of the plugin.
 	 * @since     1.0.0
-	 * @return    Arva_Seo_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader(): Hooks {
 		return $this->loader;
 	}
 
 	/**
 	 * Retrieve the version number of the plugin.
 	 *
-	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
+	 * @since     1.0.0
 	 */
-	public function get_version() {
+	public function get_version(): string {
 		return $this->version;
 	}
 

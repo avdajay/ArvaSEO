@@ -1,5 +1,9 @@
 <?php
 
+namespace ArvaSeo\Core;
+
+use ArvaSeo\Extensions\SeoPluginChecker;
+
 /**
  * Fired during plugin activation
  *
@@ -20,17 +24,26 @@
  * @subpackage Arva_Seo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
  */
-class Arva_Seo_Activator {
+class Activator {
 
 	/**
-	 * Short Description. (use period)
+	 * Runs all actions necessary to activate the plugin.
 	 *
-	 * Long Description.
+	 * Set up the plugin's initial state. And check for required dependencies.
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate() {
+	public static function activate(): void {
 
+	}
+
+	public function check_seo_plugins()
+	{
+		$active_seo_plugin = new SeoPluginChecker();
+
+		if ( $active_seo_plugin->check() ) {
+			return true;
+		}
 	}
 
 }
