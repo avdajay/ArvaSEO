@@ -77,8 +77,8 @@ class SetupPages {
 
 		add_submenu_page(
 			'arva-seo',
-			'General',
-			'General',
+			'Dashboard',
+			'Dashboard',
 			'manage_options',
 			'arva-seo',
 			array( $this, 'arva_seo_page' )
@@ -99,7 +99,7 @@ class SetupPages {
 			'Bulk Edit',
 			'manage_options',
 			'arva-seo-bulk-edit',
-			array( $this, 'arva_seo_crawl_page' )
+			array( $this, 'arva_seo_bulk_edit_page' )
 		);
 
 		add_submenu_page(
@@ -114,6 +114,10 @@ class SetupPages {
 
 	public function arva_seo_page(): null {
 		return View::render( 'admin.dashboard' );
+	}
+
+	public function arva_seo_bulk_edit_page(): null {
+		return View::render( 'admin.bulk-edit' );
 	}
 
 	public function arva_seo_settings_page(): null {

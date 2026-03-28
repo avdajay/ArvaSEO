@@ -1,4 +1,7 @@
-<div class="wrap">
-    <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-    <p><?php esc_html_e( 'View your SEO analytics here.', 'arva-seo' ); ?></p>
+<div class="font-sans arva-seo-container">
+    <h1>Crawl</h1>
+    <div class="flex flex-col bg-green-50 rounded-xl p-4 border-2 border-solid border-green-700">
+        <div>
+            <button class="bg-green-700 py-3 px-6 text-white text-lg">Start Crawl</button>
+    </div>
 </div>

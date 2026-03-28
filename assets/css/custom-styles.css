@@ -1,14 +1,24 @@
-body.toplevel_page_arva-seo #wpcontent {
+body.toplevel_page_arva-seo #wpcontent,
+body.arva-seo_page_arva-seo-crawl #wpcontent,
+body.arva-seo_page_arva-seo-bulk-edit #wpcontent,
+body.arva-seo_page_arva-seo-settings #wpcontent {
     padding-left: 0 !important;
 }
 
-body.toplevel_page_arva-seo h1 {
+body.toplevel_page_arva-seo #wpbody,
+body.arva-seo_page_arva-seo-crawl #wpbody,
+body.arva-seo_page_arva-seo-bulk-edit #wpbody,
+body.arva-seo_page_arva-seo-settings #wpbody {
+    background: #ffffff;
+}
+
+body.toplevel_page_arva-seo h1,
+body.toplevel_page_arva-seo h2,
+body.toplevel_page_arva-seo h3 {
     margin: 0;
 }
 
 .arva-seo-container {
     font-family: 'Inter', sans-serif !important;
-    padding: 30px;
-    height: 100vh;
-    background: #ffffff;
+    padding: 20px;
 }
