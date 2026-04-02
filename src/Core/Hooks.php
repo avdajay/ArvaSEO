@@ -2,8 +2,6 @@
 
 namespace ArvaSeo\Core;
 
-use ArvaSeo\Contracts\Runnable;
-
 /**
  * Register all actions and filters for the plugin.
  *
@@ -15,7 +13,7 @@ use ArvaSeo\Contracts\Runnable;
  * @subpackage ArvaSeo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
  */
-class Hooks implements Runnable {
+class Hooks {
 	/**
 	 * The array of actions registered with WordPress.
 	 *

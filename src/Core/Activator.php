@@ -2,7 +2,7 @@
 
 namespace ArvaSeo\Core;
 
-use ArvaSeo\Extensions\SeoPluginChecker;
+use ArvaSeo\Services\SeoChecker;
 
 /**
  * Fired during plugin activation
@@ -40,7 +40,7 @@ class Activator {
 	}
 
     public static function check_seo_plugins(): bool {
-        $active_seo_plugin = new SeoPluginChecker();
+        $active_seo_plugin = new SeoChecker();
 
         if ( $active_seo_plugin->check() ) {
             return true;

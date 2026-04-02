@@ -77,8 +77,8 @@ class SetupPages {
 
 		add_submenu_page(
 			'arva-seo',
-			'Dashboard',
-			'Dashboard',
+			'Opportunities',
+			'Opportunities',
 			'manage_options',
 			'arva-seo',
 			array( $this, 'arva_seo_page' )

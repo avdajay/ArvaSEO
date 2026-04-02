@@ -50,7 +50,8 @@ class AdminEnqueue {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct( string $plugin_name, string $version ) {
+	public function __construct( string $plugin_name, string $version )
+	{
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
@@ -62,12 +63,13 @@ class AdminEnqueue {
 	 *
 	 * @since    1.0.0
 	 */
-    public function enqueue_styles(): void {
+    public function enqueue_styles(): void
+    {
         wp_enqueue_style( $this->plugin_name, ARVA_SEO_URL . 'assets/css/arva-seo.css', array(), $this->version, 'all' );
-        wp_enqueue_style( $this->plugin_name . '-custom', ARVA_SEO_URL . 'assets/css/custom-styles.css', array(), $this->version, 'all' );
     }
 
-    public function enqueue_scripts(): void {
+    public function enqueue_scripts(): void
+    {
         wp_enqueue_script( $this->plugin_name, ARVA_SEO_URL . 'assets/js/arva-seo.js', array( 'jquery' ), $this->version, false );
     }
 

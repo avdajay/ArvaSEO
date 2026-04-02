@@ -1,0 +1,199 @@
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+}
+
+:root {
+    --arva-seo-primary-color: #217837;
+    --arva-seo-primary-color-hover: #2CA049;
+    --arva-seo-primary-color-active: #165024;
+    --arva-seo-text-dark: #081C0D;
+    --arva-seo-text-light: #ffffff;
+    --arva-seo-bg-light: #D7F4DE;
+    --arva-seo-bg-lighter: #edf6f4;
+    --arva-seo-bg-dark: #0B2812;
+    --arva-seo-bg-darker: #000000;
+    --arva-seo-bg-primary: #217837;
+    --arva-seo-bg-primary-ligher: #2CA049;
+    --arva-seo-bg-primary-darker: #165024;
+}
+
+.arva-seo-text-dark {
+    color: var(--arva-seo-text-dark);
+}
+
+.arva-seo-text-light {
+    color: var(--arva-seo-text-light);
+}
+
+.arva-seo-bg-light {
+    background: var(--arva-seo-bg-light);
+}
+
+.arva-seo-bg-lighter {
+    background: var(--arva-seo-bg-lighter);
+}
+
+.arva-seo-bg-dark {
+    background: var(--arva-seo-bg-dark);
+}
+
+.arva-seo-bg-darker {
+    background: var(--arva-seo-bg-darker);
+}
+
+.arva-seo-bg-primary {
+    background: var(--arva-seo-bg-primary);
+}
+
+.arva-seo-bg-primary-ligher {
+    background: var(--arva-seo-bg-primary-ligher);
+}
+
+.arva-seo-bg-primary-darker {
+    background: var(--arva-seo-bg-primary-darker);
+}
+
+body.toplevel_page_arva-seo #wpcontent,
+body.arva-seo_page_arva-seo-crawl #wpcontent,
+body.arva-seo_page_arva-seo-bulk-edit #wpcontent,
+body.arva-seo_page_arva-seo-settings #wpcontent {
+    padding-left: 0 !important;
+}
+
+body.toplevel_page_arva-seo #wpbody,
+body.arva-seo_page_arva-seo-crawl #wpbody,
+body.arva-seo_page_arva-seo-bulk-edit #wpbody,
+body.arva-seo_page_arva-seo-settings #wpbody {
+    background: #ffffff!important;
+}
+
+body.toplevel_page_arva-seo h1,
+body.toplevel_page_arva-seo h2,
+body.toplevel_page_arva-seo h3,
+body.arva-seo_page_arva-seo-crawl #wpbody h1,
+body.arva-seo_page_arva-seo-crawl #wpbody h2,
+body.arva-seo_page_arva-seo-crawl #wpbody h3,
+body.arva-seo_page_arva-seo-bulk-edit #wpbody h1,
+body.arva-seo_page_arva-seo-bulk-edit #wpbody h2,
+body.arva-seo_page_arva-seo-bulk-edit #wpbody h3,
+body.arva-seo_page_arva-seo-settings #wpbody h1,
+body.arva-seo_page_arva-seo-settings #wpbody h2,
+body.arva-seo_page_arva-seo-settings #wpbody h3 {
+    margin: 0!important;
+}
+
+.arva-seo-wrapper {
+    font-family: 'Inter', sans-serif !important;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.arva-seo-column {
+    flex-direction: column;
+}
+
+.arva-seo-container-item {
+    flex: 1 1 calc(100% / 6);
+}
+
+.arva-seo-btn-primary {
+    background: var(--arva-seo-primary-color);
+    padding: 10px 20px;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.arva-seo-btn-primary:hover {
+    background: var(--arva-seo-primary-color-hover);
+}
+
+.arva-seo-btn-primary:active {
+    background: var(--arva-seo-primary-color-active);
+}
+
+.arva-seo-container {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.arva-seo-rounded {
+    border-radius: 10px;
+}
+
+.arva-seo-border-primary {
+    border: 1px solid var(--arva-seo-primary-color);
+}
+
+.arva-seo-crawl-results-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.arva-seo-crawl-headers {
+    display: flex;
+}
+
+.arva-seo-crawl-page-info-header {
+    flex: 2;
+    background: var(--arva-seo-bg-light);
+    padding: 20px;
+    border-radius: 10px 0 0 10px;
+}
+
+.arva-seo-crawl-page-score-header {
+    flex: 1;
+    background: var(--arva-seo-bg-light);
+    padding: 20px;
+    border-radius: 0 10px 10px 0;
+}
+
+.arva-seo-crawl-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.arva-seo-craw-list-page-info {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 20px;
+}
+
+.arva-seo-craw-list-page-score {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 20px;
+}
+
+.arva-seo-crawl-body-item {
+    display: flex;
+    border-radius: 10px;
+}
+
+.arva-seo-craw-list-page-info p, .arva-seo-craw-list-page-score p {
+    margin: 0;
+}
+
+.arva-seo-score-box {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    color: #ffffff;
+    font-weight: 700;
+}

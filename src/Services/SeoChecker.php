@@ -1,10 +1,11 @@
 <?php
 
-namespace ArvaSeo\Extensions;
+namespace ArvaSeo\Services;
 
-class SeoPluginChecker {
+class SeoChecker {
 
 	protected array $plugins;
+	public string $detected_plugin;
 
 	public function __construct() {
         $this->plugins = [
@@ -31,6 +32,7 @@ class SeoPluginChecker {
 		{
 			if (is_plugin_active($plugin))
 			{
+				$this->detected_plugin = $plugin;
 				return true;
 			}
 		}
