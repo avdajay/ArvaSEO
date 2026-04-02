@@ -5,6 +5,12 @@ namespace ArvaSeo\Core;
 use ArvaSeo\Admin\AdminEnqueue;
 use ArvaSeo\Admin\Notices;
 use ArvaSeo\Admin\SetupPages;
+use ArvaSeo\Actions\ExportCrawl;
+use ArvaSeo\Actions\StartCrawler;
+use ArvaSeo\Repositories\CrawlResultsRepository;
+use ArvaSeo\Repositories\CrawlStateRepository;
+use ArvaSeo\Services\Crawl;
+use ArvaSeo\Services\SeoProviderResolver;
 
 /**
  * The file that defines the core plugin class
@@ -132,14 +138,30 @@ class Bootstrap {
 	 */
 	private function load_hooks(): void
 	{
+		$crawl_results_repository = new CrawlResultsRepository();
+		$crawl_results_repository->ensure_schema();
+		$crawl_state_repository = new CrawlStateRepository();
+		$provider_resolver = new SeoProviderResolver();
+		$crawl = new Crawl( $provider_resolver->resolve(), $crawl_results_repository, $crawl_state_repository );
 		$admin_enqueue = new AdminEnqueue( $this->get_plugin_name(), $this->get_version() );
-		$setup_pages = new SetupPages( $this->get_plugin_name(), $this->get_version() );
+		$setup_pages = new SetupPages(
+			$this->get_plugin_name(),
+			$this->get_version(),
+			$crawl_results_repository,
+			$crawl_state_repository,
+			$provider_resolver
+		);
 		$notices = new Notices();
+		$start_crawler = new StartCrawler( $crawl );
+		$export_crawl = new ExportCrawl( $crawl_results_repository );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin_enqueue, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin_enqueue, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $setup_pages, 'add_admin_menu' );
 		$this->loader->add_action( 'admin_notices', $notices, 'no_seo_plugin_notice' );
+		$this->loader->add_action( 'admin_notices', $notices, 'crawl_complete_notice' );
+		$this->loader->add_action( 'wp_ajax_arva_seo_start_crawl', $start_crawler, 'handle' );
+		$this->loader->add_action( 'admin_post_arva_seo_export_crawl', $export_crawl, 'handle' );
 	}
 
 	/**

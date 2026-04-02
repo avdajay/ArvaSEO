@@ -23,4 +23,22 @@ class Notices {
         View::render( 'notices.no-seo-plugin' );
     }
 
+	public function crawl_complete_notice(): void {
+		if ( ! isset( $_GET['page'], $_GET['arva_seo_notice'] ) ) {
+			return;
+		}
+
+		if ( 'arva-seo-crawl' !== sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
+			return;
+		}
+
+		if ( 'crawl-complete' !== sanitize_text_field( wp_unslash( $_GET['arva_seo_notice'] ) ) ) {
+			return;
+		}
+
+		echo '<div class="notice notice-success is-dismissible"><p>' .
+			esc_html__( 'Crawl completed successfully.', 'arva-seo' ) .
+			'</p></div>';
+	}
+
 }

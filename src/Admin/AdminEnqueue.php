@@ -70,7 +70,17 @@ class AdminEnqueue {
 
     public function enqueue_scripts(): void
     {
-        wp_enqueue_script( $this->plugin_name, ARVA_SEO_URL . 'assets/js/arva-seo.js', array( 'jquery' ), $this->version, false );
+        wp_enqueue_script( $this->plugin_name, ARVA_SEO_URL . 'assets/js/arva-seo.js', array(), $this->version, true );
+		wp_localize_script(
+			$this->plugin_name,
+			'arvaSeoAdmin',
+			[
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'crawlNonce' => wp_create_nonce( 'arva_seo_start_crawl' ),
+				'crawlAction' => 'arva_seo_start_crawl',
+				'crawlChunkSize' => 20,
+			]
+		);
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace ArvaSeo\Core;
 
+use ArvaSeo\Repositories\CrawlResultsRepository;
 use ArvaSeo\Services\SeoChecker;
 
 /**
@@ -36,7 +37,7 @@ class Activator {
 	public static function activate(): void
 	{
         self::check_seo_plugins();
-		self::add_admin_body_class();
+		( new CrawlResultsRepository() )->ensure_schema();
 	}
 
     public static function check_seo_plugins(): bool {

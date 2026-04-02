@@ -1,55 +1,191 @@
 <div class="arva-seo-wrapper">
     <h1 class="arva-seo-text-dark">Crawl</h1>
-    <div class="arva-seo-container arva-seo-bg-lighter arva-seo-rounded">
-        <button class="arva-seo-btn-primary">Start Crawl</button>
-        <p class="arva-seo-text-dark">This will start the crawling process for the first time.</p>
+    <div class="arva-seo-container arva-seo-bg-lighter arva-seo-rounded arva-seo-crawl-toolbar">
+        <div class="arva-seo-crawl-toolbar-copy">
+            <button
+                class="arva-seo-btn-primary"
+                id="arva-seo-start-crawl"
+                <?php disabled( ! $has_active_provider ); ?>
+            >
+                Start Crawl
+            </button>
+            <p class="arva-seo-text-dark">
+				<?php
+				if ( $has_active_provider ) {
+					echo esc_html( sprintf( 'Detected SEO provider: %s', $active_provider ) );
+				} else {
+					echo esc_html__( 'No supported SEO plugin is active. Activate Yoast SEO, All in One SEO, Rank Math, or SEOPress to crawl.', 'arva-seo' );
+				}
+				?>
+            </p>
+            <p class="arva-seo-crawl-status" id="arva-seo-crawl-status" aria-live="polite"></p>
+        </div>
+        <div
+            class="arva-seo-crawl-controls-left arva-seo-rounded"
+            aria-live="polite"
+            id="arva-seo-crawl-state"
+            data-active="<?php echo esc_attr( in_array( $crawl_state['status'], [ 'running', 'paused' ], true ) ? '1' : '0' ); ?>"
+            data-percentage="<?php echo esc_attr( (int) $crawl_state['percentage'] ); ?>"
+            data-processed="<?php echo esc_attr( (int) $crawl_state['processed'] ); ?>"
+            data-total="<?php echo esc_attr( (int) $crawl_state['total'] ); ?>"
+            data-status="<?php echo esc_attr( $crawl_state['status'] ); ?>"
+            data-crawled="<?php echo esc_attr( (int) $crawl_state['crawled_count'] ); ?>"
+            data-skipped="<?php echo esc_attr( (int) $crawl_state['skipped_count'] ); ?>"
+            data-errors="<?php echo esc_attr( (int) $crawl_state['error_count'] ); ?>"
+        >
+            <a class="arva-seo-btn-primary arva-seo-export-btn" href="<?php echo esc_url( $export_url ); ?>">
+				<?php esc_html_e( 'Export Data', 'arva-seo' ); ?>
+            </a>
+            <div class="arva-seo-crawl-donut-stack">
+                <span class="arva-seo-summary-label"><?php esc_html_e( 'Progress', 'arva-seo' ); ?></span>
+                <div class="arva-seo-crawl-donut" id="arva-seo-crawl-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( (int) $crawl_state['percentage'] ); ?>" style="--progress: <?php echo esc_attr( (int) $crawl_state['percentage'] ); ?>;">
+                    <span class="arva-seo-crawl-donut-inner" id="arva-seo-crawl-progress-percent"><?php echo esc_html( (int) $crawl_state['percentage'] ); ?>%</span>
+                </div>
+                <p class="arva-seo-summary-meta" id="arva-seo-crawl-progress-copy">
+					<?php
+					if ( in_array( $crawl_state['status'], [ 'running', 'paused' ], true ) ) {
+						echo esc_html(
+							sprintf(
+								/* translators: 1: processed items, 2: total items */
+								__( 'Processed %1$d of %2$d items.', 'arva-seo' ),
+								(int) $crawl_state['processed'],
+								(int) $crawl_state['total']
+							)
+						);
+					} else {
+						esc_html_e( 'Waiting to start.', 'arva-seo' );
+					}
+					?>
+                </p>
+            </div>
+        </div>
+        <div class="arva-seo-crawl-summary">
+            <span class="arva-seo-summary-label"><?php esc_html_e( 'Rows Stored', 'arva-seo' ); ?></span>
+            <strong class="arva-seo-summary-value"><?php echo esc_html( number_format_i18n( $total_items ) ); ?></strong>
+            <p class="arva-seo-summary-meta">
+				<?php
+				if ( $last_crawled_at ) {
+					printf(
+						'%s %s',
+						esc_html__( 'Last crawl:', 'arva-seo' ),
+						esc_html(
+							sprintf(
+								'%s %s',
+								wp_date( get_option( 'date_format' ), strtotime( $last_crawled_at ) ),
+								wp_date( get_option( 'time_format' ), strtotime( $last_crawled_at ) )
+							)
+						)
+					);
+				} else {
+					esc_html_e( 'Last crawl: Never', 'arva-seo' );
+				}
+				?>
+            </p>
+        </div>
     </div>
     <div class="arva-seo-crawl-results-container">
-        <div class="arva-seo-crawl-headers">
-            <div class="arva-seo-crawl-page-info-header">
-                <h3>Page Info</h3>
+        <form class="arva-seo-crawl-search arva-seo-rounded" method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
+            <input type="hidden" name="page" value="arva-seo-crawl">
+            <label class="screen-reader-text" for="arva-seo-search"><?php esc_html_e( 'Search crawl results', 'arva-seo' ); ?></label>
+            <input
+                class="arva-seo-search-input"
+                id="arva-seo-search"
+                type="search"
+                name="s"
+                value="<?php echo esc_attr( $search_query ); ?>"
+                placeholder="<?php esc_attr_e( 'Search by page title or URL', 'arva-seo' ); ?>"
+            >
+            <button class="arva-seo-btn-primary" type="submit"><?php esc_html_e( 'Search', 'arva-seo' ); ?></button>
+			<?php if ( '' !== $search_query ) : ?>
+                <a class="arva-seo-search-reset" href="<?php echo esc_url( admin_url( 'admin.php?page=arva-seo-crawl' ) ); ?>">
+					<?php esc_html_e( 'Clear', 'arva-seo' ); ?>
+                </a>
+			<?php endif; ?>
+        </form>
+        <p class="arva-seo-search-results-count">
+			<?php
+			printf(
+				/* translators: %d: number of search results */
+				esc_html__( '%d search results', 'arva-seo' ),
+				(int) $search_results_count
+			);
+			?>
+        </p>
+		<?php if ( [] === $results ) : ?>
+            <div class="arva-seo-empty-state arva-seo-bg-lighter arva-seo-rounded">
+                <h3>
+					<?php
+					echo '' === $search_query
+						? esc_html__( 'No crawl data yet', 'arva-seo' )
+						: esc_html__( 'No matching crawl results', 'arva-seo' );
+					?>
+                </h3>
+                <p>
+					<?php
+					echo '' === $search_query
+						? esc_html__( 'Run the crawler to build your denormalized SEO dataset.', 'arva-seo' )
+						: esc_html__( 'Try a different page title or URL.', 'arva-seo' );
+					?>
+                </p>
             </div>
-            <div class="arva-seo-crawl-page-score-header">
-                <h3>Page Score</h3>
-            </div>
-        </div>
-        <div class="arva-seo-crawl-body">
-            <div class="arva-seo-crawl-body-item">
-                <div class="arva-seo-craw-list-page-info">
-                    <h3>Home</h3>
-                    <p>https://some-url.com/</p>
+		<?php else : ?>
+            <div class="arva-seo-crawl-headers">
+                <div class="arva-seo-crawl-page-info-header">
+                    <h3><?php esc_html_e( 'Page Info', 'arva-seo' ); ?></h3>
                 </div>
-                <div class="arva-seo-craw-list-page-score">
-                    <div class="arva-seo-score-box arva-seo-bg-primary-darker">10</div>
+                <div class="arva-seo-crawl-page-score-header">
+                    <h3><?php esc_html_e( 'SEO Snapshot', 'arva-seo' ); ?></h3>
                 </div>
             </div>
-            <div class="arva-seo-crawl-body-item arva-seo-bg-lighter">
-                <div class="arva-seo-craw-list-page-info">
-                    <h3>About</h3>
-                    <p>https://some-url.com/about/</p>
-                </div>
-                <div class="arva-seo-craw-list-page-score">
-                    <div class="arva-seo-score-box arva-seo-bg-primary-darker">50</div>
-                </div>
+            <div class="arva-seo-crawl-body">
+				<?php foreach ( $results as $index => $result ) : ?>
+                    <div class="arva-seo-crawl-body-item <?php echo 1 === $index % 2 ? 'arva-seo-bg-lighter' : ''; ?>">
+                        <div class="arva-seo-craw-list-page-info">
+                            <h3><?php echo esc_html( $result['page_title'] ); ?></h3>
+                            <p><a href="<?php echo esc_url( $result['permalink'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $result['permalink'] ); ?></a></p>
+                            <p class="arva-seo-meta-inline">
+                                <span><?php echo esc_html( ucfirst( $result['post_type'] ) ); ?></span>
+                                <span><?php echo esc_html( $result['provider'] ); ?></span>
+                                <span><?php echo esc_html( mysql2date( get_option( 'date_format' ), $result['crawled_at'] ) ); ?></span>
+                            </p>
+                        </div>
+                        <div class="arva-seo-craw-list-page-score">
+                            <div class="arva-seo-score-box <?php echo esc_attr( $result['score'] >= 80 ? 'arva-seo-bg-primary-ligher' : ( $result['score'] >= 50 ? 'arva-seo-bg-primary' : 'arva-seo-bg-primary-darker' ) ); ?>">
+								<?php echo esc_html( $result['score'] ); ?>
+                            </div>
+                            <div class="arva-seo-seo-copy">
+                                <p><strong><?php esc_html_e( 'SEO Title:', 'arva-seo' ); ?></strong> <?php echo esc_html( '' !== $result['seo_title'] ? $result['seo_title'] : 'Not set' ); ?></p>
+                                <p><strong><?php esc_html_e( 'Meta Description:', 'arva-seo' ); ?></strong> <?php echo esc_html( '' !== $result['seo_description'] ? $result['seo_description'] : 'Not set' ); ?></p>
+                            </div>
+                        </div>
+                    </div>
+				<?php endforeach; ?>
             </div>
-            <div class="arva-seo-crawl-body-item">
-                <div class="arva-seo-craw-list-page-info">
-                    <h3>Contact Us</h3>
-                    <p>https://some-url.com/contact/</p>
+			<?php if ( $total_pages > 1 ) : ?>
+                <div class="arva-seo-pagination">
+					<?php
+					echo wp_kses_post(
+						paginate_links(
+							[
+								'base' => add_query_arg(
+									[
+										'page' => 'arva-seo-crawl',
+										'paged' => '%#%',
+										's' => $search_query,
+									],
+									admin_url( 'admin.php' )
+								),
+								'format' => '',
+								'current' => $current_page,
+								'total' => $total_pages,
+								'prev_text' => __( 'Previous', 'arva-seo' ),
+								'next_text' => __( 'Next', 'arva-seo' ),
+							]
+						)
+					);
+					?>
                 </div>
-                <div class="arva-seo-craw-list-page-score">
-                    <div class="arva-seo-score-box arva-seo-bg-primary">68</div>
-                </div>
-            </div>
-            <div class="arva-seo-crawl-body-item arva-seo-bg-lighter">
-                <div class="arva-seo-craw-list-page-info">
-                    <h3>Services</h3>
-                    <p>https://some-url.com/services/</p>
-                </div>
-                <div class="arva-seo-craw-list-page-score">
-                    <div class="arva-seo-score-box arva-seo-bg-primary-ligher">96</div>
-                </div>
-            </div>
-        </div>
+			<?php endif; ?>
+		<?php endif; ?>
     </div>
 </div>

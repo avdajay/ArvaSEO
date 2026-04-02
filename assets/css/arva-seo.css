@@ -137,29 +137,32 @@ body.arva-seo_page_arva-seo-settings #wpbody h3 {
     display: flex;
     flex-direction: column;
     padding: 20px 0;
+    gap: 20px;
 }
 
 .arva-seo-crawl-headers {
     display: flex;
+    gap: 12px;
 }
 
 .arva-seo-crawl-page-info-header {
     flex: 2;
     background: var(--arva-seo-bg-light);
     padding: 20px;
-    border-radius: 10px 0 0 10px;
+    border-radius: 10px;
 }
 
 .arva-seo-crawl-page-score-header {
     flex: 1;
     background: var(--arva-seo-bg-light);
     padding: 20px;
-    border-radius: 0 10px 10px 0;
+    border-radius: 10px;
 }
 
 .arva-seo-crawl-body {
     display: flex;
     flex-direction: column;
+    gap: 12px;
 }
 
 .arva-seo-craw-list-page-info {
@@ -181,6 +184,7 @@ body.arva-seo_page_arva-seo-settings #wpbody h3 {
 .arva-seo-crawl-body-item {
     display: flex;
     border-radius: 10px;
+    overflow: hidden;
 }
 
 .arva-seo-craw-list-page-info p, .arva-seo-craw-list-page-score p {
@@ -196,4 +200,274 @@ body.arva-seo_page_arva-seo-settings #wpbody h3 {
     border-radius: 5px;
     color: #ffffff;
     font-weight: 700;
+}
+
+.arva-seo-crawl-toolbar {
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 24px;
+}
+
+.arva-seo-crawl-toolbar-copy {
+    flex: 0 1 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    min-width: 260px;
+    max-width: 300px;
+}
+
+.arva-seo-crawl-status {
+    min-height: 20px;
+    margin: 0;
+    color: var(--arva-seo-primary-color-active);
+    font-weight: 600;
+}
+
+.arva-seo-crawl-progress-wrap {
+    flex: 1 1 280px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.arva-seo-crawl-progress-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.arva-seo-crawl-progress-percent {
+    color: var(--arva-seo-text-dark);
+    font-size: 18px;
+}
+
+.arva-seo-crawl-progress {
+    --progress: 0;
+}
+
+.arva-seo-crawl-progress-bar {
+    display: none;
+}
+
+.arva-seo-summary-label {
+    display: block;
+    color: var(--arva-seo-text-dark);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.arva-seo-summary-value {
+    display: block;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--arva-seo-text-dark);
+}
+
+.arva-seo-summary-meta {
+    margin: 10px 0 0;
+    color: #49614f;
+    font-size: 13px;
+}
+
+.arva-seo-seo-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.arva-seo-seo-copy p {
+    margin: 0;
+}
+
+.arva-seo-meta-inline {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px !important;
+    font-size: 12px;
+    color: #49614f;
+}
+
+.arva-seo-meta-inline span {
+    background: rgba(33, 120, 55, 0.08);
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+.arva-seo-empty-state {
+    padding: 32px;
+}
+
+.arva-seo-crawl-controls {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+}
+
+.arva-seo-crawl-controls-left {
+    flex: 1 1 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 20px;
+    min-width: 320px;
+}
+
+.arva-seo-crawl-search {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    flex-wrap: wrap;
+    background: var(--arva-seo-bg-lighter);
+    border: 1px solid #d9e7dc;
+}
+
+.arva-seo-search-input {
+    flex: 0 1 320px;
+    width: 320px;
+    min-height: 42px !important;
+    padding: 0 14px !important;
+    border-radius: 8px !important;
+    background: #ffffff;
+    color: var(--arva-seo-text-dark) !important;
+}
+
+.arva-seo-search-reset {
+    color: var(--arva-seo-primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.arva-seo-search-results-count {
+    margin: -8px 0 0;
+    color: #49614f;
+    font-size: 13px;
+}
+
+.arva-seo-crawl-summary {
+    flex: 0 1 210px;
+    min-width: 190px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.arva-seo-export-btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    white-space: nowrap;
+    min-width: 126px;
+}
+
+.arva-seo-crawl-donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.arva-seo-crawl-donut-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.arva-seo-crawl-donut {
+    --progress: 0;
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--arva-seo-primary-color) calc(var(--progress) * 1%),
+        #d7e8dc 0
+    );
+    display: grid;
+    place-items: center;
+    position: relative;
+}
+
+.arva-seo-crawl-donut::after {
+    content: '';
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: #ffffff;
+    position: absolute;
+}
+
+.arva-seo-crawl-donut-inner {
+    position: relative;
+    z-index: 1;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--arva-seo-text-dark);
+}
+
+.arva-seo-pagination {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.arva-seo-pagination .page-numbers {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+    margin-left: 8px;
+    border-radius: 8px;
+    border: 1px solid #c6ddd0;
+    text-decoration: none;
+    color: var(--arva-seo-text-dark);
+    background: #ffffff;
+}
+
+.arva-seo-pagination .page-numbers.current {
+    background: var(--arva-seo-primary-color);
+    color: #ffffff;
+    border-color: var(--arva-seo-primary-color);
+}
+
+@media (max-width: 960px) {
+    .arva-seo-crawl-toolbar,
+    .arva-seo-crawl-headers,
+    .arva-seo-crawl-body-item {
+        flex-direction: column;
+    }
+
+    .arva-seo-crawl-controls-left,
+    .arva-seo-crawl-progress-wrap,
+    .arva-seo-crawl-summary,
+    .arva-seo-crawl-toolbar-copy,
+    .arva-seo-search-input,
+    .arva-seo-crawl-search {
+        max-width: none;
+        width: 100%;
+    }
+
+    .arva-seo-crawl-controls-left,
+    .arva-seo-crawl-search {
+        justify-content: flex-start;
+    }
+
+    .arva-seo-search-input {
+        flex: 1 1 auto;
+    }
+
+    .arva-seo-craw-list-page-score {
+        gap: 12px;
+    }
 }

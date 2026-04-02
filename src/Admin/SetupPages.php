@@ -3,6 +3,9 @@
 namespace ArvaSeo\Admin;
 
 use ArvaSeo\Helpers\View;
+use ArvaSeo\Repositories\CrawlResultsRepository;
+use ArvaSeo\Repositories\CrawlStateRepository;
+use ArvaSeo\Services\SeoProviderResolver;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -43,6 +46,9 @@ class SetupPages {
 	 * @var      string $version The current version of this plugin.
 	 */
 	private string $version;
+	private CrawlResultsRepository $crawl_results_repository;
+	private CrawlStateRepository $crawl_state_repository;
+	private SeoProviderResolver $provider_resolver;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -52,10 +58,19 @@ class SetupPages {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct( string $plugin_name, string $version ) {
+	public function __construct(
+		string $plugin_name,
+		string $version,
+		CrawlResultsRepository $crawl_results_repository,
+		CrawlStateRepository $crawl_state_repository,
+		SeoProviderResolver $provider_resolver
+	) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->crawl_results_repository = $crawl_results_repository;
+		$this->crawl_state_repository = $crawl_state_repository;
+		$this->provider_resolver = $provider_resolver;
 
 	}
 
@@ -71,7 +86,7 @@ class SetupPages {
 			'manage_options',
 			'arva-seo',
 			array( $this, 'arva_seo_page' ),
-			'dashicons-admin-generic',
+			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEwIDJMMyAxN2gzbDItNGg0bDIgNGgzTDEwIDJ6bTAgNWwtMS41IDNoM0wxMCA3eiIgZmlsbD0iY3VycmVudENvbG9yIi8+PHBhdGggZD0iTTEzIDNoNXY1bC0yLTItMi41IDIuNS0xLjUtMS41TDE0LjUgNC41IDEzIDN6IiBmaWxsPSJjdXJyZW50Q29sb3IiLz48L3N2Zz4=',
 			100
 		);
 
@@ -125,7 +140,41 @@ class SetupPages {
 	}
 
 	public function arva_seo_crawl_page(): null {
-		return View::render( 'admin.crawl' );
+		$current_page = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+		$search_query = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+		$per_page = 20;
+		$total_rows_stored = $this->crawl_results_repository->count_results();
+		$search_results_count = $this->crawl_results_repository->count_results_by_search( $search_query );
+		$total_pages = max( 1, (int) ceil( $search_results_count / $per_page ) );
+		$current_page = min( $current_page, $total_pages );
+		$last_crawled_at = $this->crawl_results_repository->get_last_crawled_at();
+
+		return View::render(
+			'admin.crawl',
+			[
+				'active_provider' => $this->provider_resolver->get_active_provider_name(),
+				'has_active_provider' => $this->provider_resolver->has_active_provider(),
+				'results' => $this->crawl_results_repository->get_paginated_results( $current_page, $per_page, $search_query ),
+				'current_page' => $current_page,
+				'total_pages' => $total_pages,
+				'total_items' => $total_rows_stored,
+				'search_results_count' => $search_results_count,
+				'last_crawled_at' => $last_crawled_at,
+				'crawl_state' => $this->crawl_state_repository->get_state(),
+				'search_query' => $search_query,
+				'export_url' => wp_nonce_url(
+					add_query_arg(
+						[
+							'action' => 'arva_seo_export_crawl',
+							's' => $search_query,
+						],
+						admin_url( 'admin-post.php' )
+					),
+					'arva_seo_export_crawl',
+					'arva_seo_export_nonce'
+				),
+			]
+		);
 	}
 
 }
