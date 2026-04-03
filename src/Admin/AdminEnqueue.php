@@ -79,6 +79,9 @@ class AdminEnqueue {
 				'crawlNonce' => wp_create_nonce( 'arva_seo_start_crawl' ),
 				'crawlAction' => 'arva_seo_start_crawl',
 				'crawlChunkSize' => 20,
+				'bulkEditNonce' => wp_create_nonce( 'arva_seo_bulk_edit_process' ),
+				'bulkEditPrepareAction' => 'arva_seo_bulk_edit_prepare',
+				'bulkEditProcessAction' => 'arva_seo_bulk_edit_process',
 			]
 		);
     }

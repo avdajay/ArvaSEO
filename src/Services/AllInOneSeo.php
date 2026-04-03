@@ -46,6 +46,11 @@ class AllInOneSeo extends AbstractSeoProvider {
 		return isset( $row['robots_nofollow'] ) && '1' === (string) $row['robots_nofollow'];
 	}
 
+	public function update_post_fields( int $post_id, array $fields ): void {
+		parent::update_post_fields( $post_id, $fields );
+		$this->upsert_aioseo_row( $post_id, $fields );
+	}
+
 	private function get_aioseo_row( int $post_id ): array {
 		global $wpdb;
 
@@ -65,5 +70,53 @@ class AllInOneSeo extends AbstractSeoProvider {
 		);
 
 		return is_array( $row ) ? $row : [];
+	}
+
+	private function upsert_aioseo_row( int $post_id, array $fields ): void {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'aioseo_posts';
+		$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+
+		if ( $table_name !== $table_exists ) {
+			return;
+		}
+
+		$current = $this->get_aioseo_row( $post_id );
+
+		if ( [] === $current ) {
+			return;
+		}
+
+		$wpdb->update(
+			$table_name,
+			[
+				'canonical_url' => array_key_exists( 'canonical_url', $fields ) && null !== $fields['canonical_url']
+					? (string) $fields['canonical_url']
+					: (string) ( $current['canonical_url'] ?? '' ),
+				'robots_noindex' => array_key_exists( 'no_index', $fields ) && null !== $fields['no_index']
+					? ( $fields['no_index'] ? 1 : 0 )
+					: (int) ( $current['robots_noindex'] ?? 0 ),
+				'robots_nofollow' => array_key_exists( 'no_follow', $fields ) && null !== $fields['no_follow']
+					? ( $fields['no_follow'] ? 1 : 0 )
+					: (int) ( $current['robots_nofollow'] ?? 0 ),
+			],
+			[
+				'%s',
+				'%d',
+				'%d',
+			],
+			[
+				'post_id' => $post_id,
+			],
+			[
+				'%s',
+				'%d',
+				'%d',
+			],
+			[
+				'%d',
+			]
+		);
 	}
 }

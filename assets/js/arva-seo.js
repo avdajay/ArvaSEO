@@ -3,7 +3,6 @@
 
 	document.addEventListener( 'DOMContentLoaded', function() {
 		var startButton = document.getElementById( 'arva-seo-start-crawl' );
-		var statusNode = document.getElementById( 'arva-seo-crawl-status' );
 		var stateNode = document.getElementById( 'arva-seo-crawl-state' );
 		var progressNode = document.getElementById( 'arva-seo-crawl-progress' );
 		var progressPercent = document.getElementById( 'arva-seo-crawl-progress-percent' );
@@ -11,7 +10,7 @@
 		var retryTimer = null;
 		var isRunning = false;
 
-		if ( ! startButton || ! statusNode || ! stateNode || ! progressNode || ! progressPercent || ! progressCopy || 'undefined' === typeof arvaSeoAdmin ) {
+		if ( ! startButton || ! stateNode || ! progressNode || ! progressPercent || ! progressCopy || 'undefined' === typeof arvaSeoAdmin ) {
 			return;
 		}
 
@@ -40,7 +39,7 @@
 				return;
 			}
 
-			statusNode.textContent = navigator.onLine ? 'Connection recovered. Retrying crawl shortly...' : 'Connection lost. Waiting to resume crawl...';
+			progressCopy.textContent = navigator.onLine ? 'Connection recovered. Retrying crawl shortly...' : 'Connection lost. Waiting to resume crawl...';
 			retryTimer = window.setTimeout( function() {
 				retryTimer = null;
 				runCrawler( shouldStart );
@@ -92,7 +91,6 @@
 
 			if ( shouldStart ) {
 				setProgress( 0, 'Preparing first batch...' );
-				statusNode.textContent = 'Starting crawl...';
 			}
 
 			function runNextBatch( startFlag ) {
@@ -104,7 +102,6 @@
 						summary.percentage || 0,
 						'Processed ' + ( summary.processed || 0 ) + ' of ' + ( summary.total || 0 ) + ' pages. Skipped ' + ( summary.skipped_count || 0 ) + ', errors ' + ( summary.error_count || 0 ) + '.'
 					);
-					statusNode.textContent = data.message;
 
 					if ( summary.done ) {
 						setProgress( 100, 'Crawl complete.' );
@@ -137,8 +134,8 @@
 			startButton.disabled = true;
 			runCrawler( true )
 				.catch( function( error ) {
-					statusNode.textContent = error.message;
-					applyPersistedState();
+					progressCopy.textContent = error.message;
+					progressNode.setAttribute( 'aria-valuenow', stateNode.dataset.percentage || '0' );
 					startButton.disabled = false;
 				} );
 		} );
@@ -156,11 +153,123 @@
 
 		if ( '1' === stateNode.dataset.active ) {
 			startButton.disabled = true;
-			statusNode.textContent = 'Resuming crawl from saved progress...';
+			progressCopy.textContent = 'Resuming crawl from saved progress...';
 			runCrawler( false ).catch( function( error ) {
-				statusNode.textContent = error.message;
+				progressCopy.textContent = error.message;
 				startButton.disabled = false;
 			} );
 		}
+	} );
+
+	document.addEventListener( 'DOMContentLoaded', function() {
+		var bulkForm = document.getElementById( 'arva-seo-bulk-edit-form' );
+		var bulkButton = document.getElementById( 'arva-seo-start-bulk-edit' );
+		var bulkState = document.getElementById( 'arva-seo-bulk-edit-state' );
+		var bulkProgress = document.getElementById( 'arva-seo-bulk-edit-progress' );
+		var bulkPercent = document.getElementById( 'arva-seo-bulk-edit-progress-percent' );
+		var bulkCopy = document.getElementById( 'arva-seo-bulk-edit-progress-copy' );
+		var isRunning = false;
+
+		if ( ! bulkForm || ! bulkButton || ! bulkState || ! bulkProgress || ! bulkPercent || ! bulkCopy || 'undefined' === typeof arvaSeoAdmin ) {
+			return;
+		}
+
+		function setBulkProgress( percentage, copy ) {
+			var safePercentage = Math.max( 0, Math.min( 100, percentage ) );
+
+			bulkProgress.style.setProperty( '--progress', safePercentage );
+			bulkProgress.setAttribute( 'aria-valuenow', safePercentage );
+			bulkPercent.textContent = safePercentage + '%';
+			bulkCopy.textContent = copy;
+		}
+
+		function serializeRows() {
+			var formData = new FormData( bulkForm );
+			var rows = {};
+
+			formData.forEach( function( value, key ) {
+				var match = key.match( /^rows\[(\d+)\]\[(.+)\]$/ );
+
+				if ( ! match ) {
+					return;
+				}
+
+				if ( ! rows[ match[1] ] ) {
+					rows[ match[1] ] = {};
+				}
+
+				rows[ match[1] ][ match[2] ] = value;
+			} );
+
+			return Object.keys( rows ).map( function( rowKey ) {
+				return rows[ rowKey ];
+			} );
+		}
+
+		function postBulk( action, payload ) {
+			var formData = new FormData();
+			formData.append( 'action', action );
+			formData.append( 'nonce', arvaSeoAdmin.bulkEditNonce );
+
+			Object.keys( payload ).forEach( function( key ) {
+				formData.append( key, payload[ key ] );
+			} );
+
+			return window.fetch( arvaSeoAdmin.ajaxUrl, {
+				method: 'POST',
+				credentials: 'same-origin',
+				body: formData,
+			} ).then( function( response ) {
+				return response.json();
+			} ).then( function( payload ) {
+				if ( ! payload.success ) {
+					throw new Error( payload.data && payload.data.message ? payload.data.message : 'Bulk edit failed.' );
+				}
+
+				return payload.data;
+			} );
+		}
+
+		function runBatchLoop() {
+			return postBulk( arvaSeoAdmin.bulkEditProcessAction, {} ).then( function( data ) {
+				var state = data.state || {};
+
+				setBulkProgress( state.percentage || 0, data.message || 'Processing...' );
+
+				if ( data.done ) {
+					isRunning = false;
+					bulkButton.disabled = false;
+					return;
+				}
+
+				return runBatchLoop();
+			} );
+		}
+
+		bulkButton.addEventListener( 'click', function() {
+			if ( isRunning ) {
+				return;
+			}
+
+			isRunning = true;
+			bulkButton.disabled = true;
+			bulkState.scrollIntoView( {
+				behavior: 'smooth',
+				block: 'start',
+			} );
+			setBulkProgress( 0, 'Saving preview edits...' );
+
+			postBulk( arvaSeoAdmin.bulkEditPrepareAction, {
+				rows: JSON.stringify( serializeRows() ),
+			} ).then( function() {
+				setBulkProgress( 0, 'Starting bulk update...' );
+
+				return runBatchLoop();
+			} ).catch( function( error ) {
+				isRunning = false;
+				bulkButton.disabled = false;
+				bulkCopy.textContent = error.message;
+			} );
+		} );
 	} );
 })();

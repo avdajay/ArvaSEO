@@ -51,4 +51,16 @@ class Yoast extends AbstractSeoProvider {
 		return in_array( (string) $value, [ '1', 'yes', 'true', 'nofollow' ], true );
 	}
 
+	protected function update_post_canonical_url( int $post_id, string $value ): void {
+		update_post_meta( $post_id, '_yoast_wpseo_canonical', $value );
+	}
+
+	protected function update_post_noindex( int $post_id, bool $value ): void {
+		update_post_meta( $post_id, '_yoast_wpseo_meta-robots-noindex', $value ? '1' : '0' );
+	}
+
+	protected function update_post_nofollow( int $post_id, bool $value ): void {
+		update_post_meta( $post_id, '_yoast_wpseo_meta-robots-nofollow', $value ? '1' : '0' );
+	}
+
 }

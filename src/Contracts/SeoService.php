@@ -23,6 +23,8 @@ interface SeoService {
 
 	public function is_post_nofollow( int $post_id ): bool;
 
+	public function update_post_fields( int $post_id, array $fields ): void;
+
 	public function get_term_id( string $url ): int;
 
 	public function get_term_taxonomy( int $id ): string;

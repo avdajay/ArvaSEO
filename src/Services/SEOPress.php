@@ -40,4 +40,16 @@ class SEOPress extends AbstractSeoProvider {
 	public function is_post_nofollow( int $post_id ): bool {
 		return 'yes' === get_post_meta( $post_id, '_seopress_robots_follow', true );
 	}
+
+	protected function update_post_canonical_url( int $post_id, string $value ): void {
+		update_post_meta( $post_id, '_seopress_robots_canonical', $value );
+	}
+
+	protected function update_post_noindex( int $post_id, bool $value ): void {
+		update_post_meta( $post_id, '_seopress_robots_index', $value ? 'yes' : 'no' );
+	}
+
+	protected function update_post_nofollow( int $post_id, bool $value ): void {
+		update_post_meta( $post_id, '_seopress_robots_follow', $value ? 'yes' : 'no' );
+	}
 }

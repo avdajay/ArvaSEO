@@ -64,6 +64,37 @@ abstract class AbstractSeoProvider implements SeoService {
 		return false;
 	}
 
+	public function update_post_fields( int $post_id, array $fields ): void {
+		if ( array_key_exists( 'title', $fields ) && null !== $fields['title'] ) {
+			update_post_meta( $post_id, $this->get_title_meta_key(), (string) $fields['title'] );
+		}
+
+		if ( array_key_exists( 'description', $fields ) && null !== $fields['description'] ) {
+			update_post_meta( $post_id, $this->get_description_meta_key(), (string) $fields['description'] );
+		}
+
+		if ( array_key_exists( 'canonical_url', $fields ) && null !== $fields['canonical_url'] ) {
+			$this->update_post_canonical_url( $post_id, (string) $fields['canonical_url'] );
+		}
+
+		if ( array_key_exists( 'no_index', $fields ) && null !== $fields['no_index'] ) {
+			$this->update_post_noindex( $post_id, (bool) $fields['no_index'] );
+		}
+
+		if ( array_key_exists( 'no_follow', $fields ) && null !== $fields['no_follow'] ) {
+			$this->update_post_nofollow( $post_id, (bool) $fields['no_follow'] );
+		}
+	}
+
+	protected function update_post_canonical_url( int $post_id, string $value ): void {
+	}
+
+	protected function update_post_noindex( int $post_id, bool $value ): void {
+	}
+
+	protected function update_post_nofollow( int $post_id, bool $value ): void {
+	}
+
 	public function get_term_id( string $url ): int {
 		$path = parse_url( $url, PHP_URL_PATH );
 

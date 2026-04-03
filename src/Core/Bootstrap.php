@@ -6,7 +6,10 @@ use ArvaSeo\Admin\AdminEnqueue;
 use ArvaSeo\Admin\Notices;
 use ArvaSeo\Admin\SetupPages;
 use ArvaSeo\Actions\ExportCrawl;
+use ArvaSeo\Actions\ProcessBulkEdit;
 use ArvaSeo\Actions\StartCrawler;
+use ArvaSeo\Actions\UploadBulkEdit;
+use ArvaSeo\Repositories\BulkEditRepository;
 use ArvaSeo\Repositories\CrawlResultsRepository;
 use ArvaSeo\Repositories\CrawlStateRepository;
 use ArvaSeo\Services\Crawl;
@@ -138,6 +141,7 @@ class Bootstrap {
 	 */
 	private function load_hooks(): void
 	{
+		$bulk_edit_repository = new BulkEditRepository();
 		$crawl_results_repository = new CrawlResultsRepository();
 		$crawl_results_repository->ensure_schema();
 		$crawl_state_repository = new CrawlStateRepository();
@@ -147,6 +151,7 @@ class Bootstrap {
 		$setup_pages = new SetupPages(
 			$this->get_plugin_name(),
 			$this->get_version(),
+			$bulk_edit_repository,
 			$crawl_results_repository,
 			$crawl_state_repository,
 			$provider_resolver
@@ -154,6 +159,8 @@ class Bootstrap {
 		$notices = new Notices();
 		$start_crawler = new StartCrawler( $crawl );
 		$export_crawl = new ExportCrawl( $crawl_results_repository );
+		$upload_bulk_edit = new UploadBulkEdit( $provider_resolver, $bulk_edit_repository );
+		$process_bulk_edit = new ProcessBulkEdit( $provider_resolver, $bulk_edit_repository );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin_enqueue, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin_enqueue, 'enqueue_scripts' );
@@ -162,6 +169,9 @@ class Bootstrap {
 		$this->loader->add_action( 'admin_notices', $notices, 'crawl_complete_notice' );
 		$this->loader->add_action( 'wp_ajax_arva_seo_start_crawl', $start_crawler, 'handle' );
 		$this->loader->add_action( 'admin_post_arva_seo_export_crawl', $export_crawl, 'handle' );
+		$this->loader->add_action( 'admin_post_arva_seo_upload_bulk_edit', $upload_bulk_edit, 'handle' );
+		$this->loader->add_action( 'wp_ajax_arva_seo_bulk_edit_prepare', $process_bulk_edit, 'save_preview' );
+		$this->loader->add_action( 'wp_ajax_arva_seo_bulk_edit_process', $process_bulk_edit, 'process_batch' );
 	}
 
 	/**

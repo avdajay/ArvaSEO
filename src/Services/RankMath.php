@@ -47,6 +47,22 @@ class RankMath extends AbstractSeoProvider {
 		return in_array( 'nofollow', $this->get_robots_meta( $post_id ), true );
 	}
 
+	protected function update_post_canonical_url( int $post_id, string $value ): void {
+		update_post_meta( $post_id, 'rank_math_canonical_url', $value );
+	}
+
+	protected function update_post_noindex( int $post_id, bool $value ): void {
+		$robots = $this->get_robots_meta( $post_id );
+		$robots = $this->replace_robot_directive( $robots, 'noindex', 'index', $value );
+		update_post_meta( $post_id, 'rank_math_robots', array_values( array_unique( $robots ) ) );
+	}
+
+	protected function update_post_nofollow( int $post_id, bool $value ): void {
+		$robots = $this->get_robots_meta( $post_id );
+		$robots = $this->replace_robot_directive( $robots, 'nofollow', 'follow', $value );
+		update_post_meta( $post_id, 'rank_math_robots', array_values( array_unique( $robots ) ) );
+	}
+
 	private function get_robots_meta( int $post_id ): array {
 		$robots = get_post_meta( $post_id, 'rank_math_robots', true );
 
@@ -59,5 +75,17 @@ class RankMath extends AbstractSeoProvider {
 		}
 
 		return [];
+	}
+
+	private function replace_robot_directive( array $robots, string $enabled, string $disabled, bool $value ): array {
+		$robots = array_values(
+			array_filter(
+				$robots,
+				static fn( string $robot ): bool => $robot !== $enabled && $robot !== $disabled
+			)
+		);
+		$robots[] = $value ? $enabled : $disabled;
+
+		return $robots;
 	}
 }

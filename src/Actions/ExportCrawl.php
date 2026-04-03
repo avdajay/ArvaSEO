@@ -36,11 +36,12 @@ class ExportCrawl {
 		fputcsv(
 			$output,
 			[
+				'URL',
 				'TITLE',
 				'DESCRIPTION',
-				'CANONICAL URL',
-				'NOFOLLOW',
-				'NOINDEX',
+				'CANONICAL_URL',
+				'NO_FOLLOW',
+				'NO_INDEX',
 			]
 		);
 
@@ -48,6 +49,7 @@ class ExportCrawl {
 			fputcsv(
 				$output,
 				[
+					(string) ( $row['permalink'] ?? '' ),
 					(string) ( $row['seo_title'] ?? '' ),
 					(string) ( $row['seo_description'] ?? '' ),
 					(string) ( $row['canonical_url'] ?? '' ),

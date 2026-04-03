@@ -197,11 +197,11 @@ class CrawlResultsRepository {
 		$search = trim( $search );
 
 		if ( '' === $search ) {
-			$sql = "SELECT seo_title, seo_description, canonical_url, robots_nofollow, robots_noindex FROM {$table_name} ORDER BY object_id ASC";
+			$sql = "SELECT permalink, seo_title, seo_description, canonical_url, robots_nofollow, robots_noindex FROM {$table_name} ORDER BY object_id ASC";
 		} else {
 			$like = '%' . $wpdb->esc_like( $search ) . '%';
 			$sql = $wpdb->prepare(
-				"SELECT seo_title, seo_description, canonical_url, robots_nofollow, robots_noindex FROM {$table_name} WHERE page_title LIKE %s OR permalink LIKE %s ORDER BY object_id ASC",
+				"SELECT permalink, seo_title, seo_description, canonical_url, robots_nofollow, robots_noindex FROM {$table_name} WHERE page_title LIKE %s OR permalink LIKE %s ORDER BY object_id ASC",
 				$like,
 				$like
 			);

@@ -3,6 +3,7 @@
 namespace ArvaSeo\Admin;
 
 use ArvaSeo\Helpers\View;
+use ArvaSeo\Repositories\BulkEditRepository;
 use ArvaSeo\Repositories\CrawlResultsRepository;
 use ArvaSeo\Repositories\CrawlStateRepository;
 use ArvaSeo\Services\SeoProviderResolver;
@@ -46,6 +47,7 @@ class SetupPages {
 	 * @var      string $version The current version of this plugin.
 	 */
 	private string $version;
+	private BulkEditRepository $bulk_edit_repository;
 	private CrawlResultsRepository $crawl_results_repository;
 	private CrawlStateRepository $crawl_state_repository;
 	private SeoProviderResolver $provider_resolver;
@@ -61,6 +63,7 @@ class SetupPages {
 	public function __construct(
 		string $plugin_name,
 		string $version,
+		BulkEditRepository $bulk_edit_repository,
 		CrawlResultsRepository $crawl_results_repository,
 		CrawlStateRepository $crawl_state_repository,
 		SeoProviderResolver $provider_resolver
@@ -68,6 +71,7 @@ class SetupPages {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->bulk_edit_repository = $bulk_edit_repository;
 		$this->crawl_results_repository = $crawl_results_repository;
 		$this->crawl_state_repository = $crawl_state_repository;
 		$this->provider_resolver = $provider_resolver;
@@ -132,7 +136,29 @@ class SetupPages {
 	}
 
 	public function arva_seo_bulk_edit_page(): null {
-		return View::render( 'admin.bulk-edit' );
+		$user_id = get_current_user_id();
+		$bulk_edit_state = $this->bulk_edit_repository->get_state( $user_id );
+		$bulk_edit_notice = isset( $_GET['arva_seo_bulk_notice'] ) ? sanitize_text_field( wp_unslash( $_GET['arva_seo_bulk_notice'] ) ) : '';
+		$completion_message = '';
+
+		if ( 'completed' === $bulk_edit_state['status'] ) {
+			$completion_message = (string) $bulk_edit_state['completed_message'];
+			$this->bulk_edit_repository->clear_preview_rows( $user_id );
+			$this->bulk_edit_repository->clear_state( $user_id );
+			$bulk_edit_state = $this->bulk_edit_repository->get_state( $user_id );
+			$bulk_edit_notice = '' !== $completion_message ? $completion_message : $bulk_edit_notice;
+		}
+
+		return View::render(
+			'admin.bulk-edit',
+			[
+				'active_provider' => $this->provider_resolver->get_active_provider_name(),
+				'has_active_provider' => $this->provider_resolver->has_active_provider(),
+				'preview_rows' => $this->bulk_edit_repository->get_preview_rows( $user_id ),
+				'bulk_edit_state' => $bulk_edit_state,
+				'bulk_edit_notice' => $bulk_edit_notice,
+			]
+		);
 	}
 
 	public function arva_seo_settings_page(): null {

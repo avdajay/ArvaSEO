@@ -46,6 +46,9 @@ class NullSeoService implements SeoService {
 		return false;
 	}
 
+	public function update_post_fields( int $post_id, array $fields ): void {
+	}
+
 	public function get_term_id( string $url ): int {
 		return 0;
 	}
