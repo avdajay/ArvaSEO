@@ -46,8 +46,6 @@ Yes, please send us an email directly at the Contact Us screen.
 2. Crawl
 3. Bulk Edit
 4. Settings
-5. Account
-6. Contact Us
 
 == Changelog ==
 

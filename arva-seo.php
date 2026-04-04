@@ -97,6 +97,27 @@ if ( function_exists( 'arva_seo_fs' ) ) {
 	// Signal that SDK was initiated.
 	do_action( 'arva_seo_fs_loaded' );
 
+	function arva_seo_cleanup_data_on_uninstall() {
+		$settings = get_option( 'arva_seo_settings', [] );
+
+		if ( empty( $settings['delete_data_on_uninstall'] ) && empty( $settings['delete_data_on_deactivation'] ) ) {
+			return;
+		}
+
+		global $wpdb;
+
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}arva_seo_crawl_results" );
+
+		delete_option( 'arva_seo_settings' );
+		delete_option( 'arva_seo_no_seo_plugin_notice' );
+		delete_option( 'arva_seo_crawl_schema_version' );
+		delete_option( 'arva_seo_crawl_state' );
+		delete_metadata( 'user', 0, 'arva_seo_bulk_edit_preview', '', true );
+		delete_metadata( 'user', 0, 'arva_seo_bulk_edit_state', '', true );
+	}
+
+	arva_seo_fs()->add_action( 'after_uninstall', 'arva_seo_cleanup_data_on_uninstall' );
+
 	/**
 	 * The code that runs during plugin activation.
 	 * This action is documented in includes/class-arva-seo-activator.php
@@ -136,5 +157,4 @@ if ( function_exists( 'arva_seo_fs' ) ) {
 	run_arva_seo();
 
 }
-
 

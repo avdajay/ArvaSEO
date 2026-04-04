@@ -40,13 +40,13 @@
 
         <div class="arva-seo-settings-row">
             <div class="arva-seo-settings-label">
-                <h3><?php esc_html_e( 'Delete Data on Deactivation', 'arva-seo' ); ?></h3>
+                <h3><?php esc_html_e( 'Delete Data on Uninstall', 'arva-seo' ); ?></h3>
             </div>
             <div class="arva-seo-settings-control">
-                <p><?php esc_html_e( 'Delete plugin crawl data and settings when the plugin is deactivated.', 'arva-seo' ); ?></p>
+                <p><?php esc_html_e( 'Delete plugin crawl data and settings when the plugin is uninstalled.', 'arva-seo' ); ?></p>
                 <label>
-                    <input type="checkbox" name="delete_data_on_deactivation" value="1" <?php checked( ! empty( $settings['delete_data_on_deactivation'] ) ); ?>>
-					<?php esc_html_e( 'Delete all plugin data on deactivation', 'arva-seo' ); ?>
+                    <input type="checkbox" name="delete_data_on_uninstall" value="1" <?php checked( ! empty( $settings['delete_data_on_uninstall'] ) ); ?>>
+					<?php esc_html_e( 'Delete all plugin data on uninstall', 'arva-seo' ); ?>
                 </label>
             </div>
         </div>
