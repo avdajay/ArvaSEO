@@ -136,7 +136,27 @@ class SetupPages {
 	}
 
 	public function arva_seo_page(): null {
-		return View::render( 'admin.dashboard' );
+		$dashboard = $this->crawl_results_repository->get_opportunities_dashboard();
+		$selected_opportunity = isset( $_GET['opportunity'] ) ? sanitize_text_field( wp_unslash( $_GET['opportunity'] ) ) : '';
+		$current_page = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+		$per_page = 20;
+		$detail_total = '' !== $selected_opportunity ? $this->crawl_results_repository->count_opportunity_items( $selected_opportunity ) : 0;
+		$detail_total_pages = max( 1, (int) ceil( $detail_total / $per_page ) );
+		$current_page = min( $current_page, $detail_total_pages );
+
+		return View::render(
+			'admin.opportunities',
+			[
+				'dashboard' => $dashboard,
+				'selected_opportunity' => $selected_opportunity,
+				'opportunity_items' => '' !== $selected_opportunity
+					? $this->crawl_results_repository->get_opportunity_items( $selected_opportunity, $current_page, $per_page )
+					: [],
+				'opportunity_total' => $detail_total,
+				'opportunity_page' => $current_page,
+				'opportunity_total_pages' => $detail_total_pages,
+			]
+		);
 	}
 
 	public function arva_seo_bulk_edit_page(): null {

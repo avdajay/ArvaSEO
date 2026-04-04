@@ -211,4 +211,96 @@ class CrawlResultsRepository {
 
 		return is_array( $results ) ? $results : [];
 	}
+
+	public function get_opportunities_dashboard(): array {
+		global $wpdb;
+
+		$table_name = $this->get_table_name();
+		$totals = $wpdb->get_row(
+			"SELECT COUNT(*) AS total_pages, COALESCE(AVG(score), 0) AS average_score FROM {$table_name}",
+			ARRAY_A
+		);
+
+		$score_bands = [
+			'critical' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE score < 50" ),
+			'warning' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE score BETWEEN 50 AND 79" ),
+			'healthy' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE score >= 80" ),
+		];
+
+		$opportunities = [
+			'title_missing' => [
+				'label' => __( 'Missing SEO Titles', 'arva-seo' ),
+				'description' => __( 'Pages with no SEO title set.', 'arva-seo' ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE seo_title = ''" ),
+			],
+			'title_length' => [
+				'label' => __( 'SEO Titles Out Of Range', 'arva-seo' ),
+				'description' => __( 'Titles shorter than 30 or longer than 60 characters.', 'arva-seo' ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE seo_title <> '' AND (CHAR_LENGTH(seo_title) < 30 OR CHAR_LENGTH(seo_title) > 60)" ),
+			],
+			'description_missing' => [
+				'label' => __( 'Missing Meta Descriptions', 'arva-seo' ),
+				'description' => __( 'Pages with no meta description set.', 'arva-seo' ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE seo_description = ''" ),
+			],
+			'description_length' => [
+				'label' => __( 'Descriptions Out Of Range', 'arva-seo' ),
+				'description' => __( 'Descriptions shorter than 120 or longer than 160 characters.', 'arva-seo' ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE seo_description <> '' AND (CHAR_LENGTH(seo_description) < 120 OR CHAR_LENGTH(seo_description) > 160)" ),
+			],
+		];
+
+		return [
+			'total_pages' => isset( $totals['total_pages'] ) ? (int) $totals['total_pages'] : 0,
+			'average_score' => isset( $totals['average_score'] ) ? (int) round( (float) $totals['average_score'] ) : 0,
+			'score_bands' => $score_bands,
+			'opportunities' => $opportunities,
+		];
+	}
+
+	public function count_opportunity_items( string $type ): int {
+		global $wpdb;
+
+		$table_name = $this->get_table_name();
+		$where = $this->get_opportunity_where_clause( $type );
+
+		if ( '' === $where ) {
+			return 0;
+		}
+
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where}" );
+	}
+
+	public function get_opportunity_items( string $type, int $page, int $per_page ): array {
+		global $wpdb;
+
+		$table_name = $this->get_table_name();
+		$where = $this->get_opportunity_where_clause( $type );
+
+		if ( '' === $where ) {
+			return [];
+		}
+
+		$page = max( 1, $page );
+		$offset = ( $page - 1 ) * $per_page;
+		$sql = $wpdb->prepare(
+			"SELECT page_title, permalink, seo_title, seo_description, score FROM {$table_name} WHERE {$where} ORDER BY score ASC, object_id ASC LIMIT %d OFFSET %d",
+			$per_page,
+			$offset
+		);
+		$results = $wpdb->get_results( $sql, ARRAY_A );
+
+		return is_array( $results ) ? $results : [];
+	}
+
+	private function get_opportunity_where_clause( string $type ): string {
+		$map = [
+			'title_missing' => "seo_title = ''",
+			'title_length' => "seo_title <> '' AND (CHAR_LENGTH(seo_title) < 30 OR CHAR_LENGTH(seo_title) > 60)",
+			'description_missing' => "seo_description = ''",
+			'description_length' => "seo_description <> '' AND (CHAR_LENGTH(seo_description) < 120 OR CHAR_LENGTH(seo_description) > 160)",
+		];
+
+		return $map[ $type ] ?? '';
+	}
 }
