@@ -6,7 +6,7 @@ use wpdb;
 
 class CrawlResultsRepository {
 
-	private const SCHEMA_VERSION = '1.2.0';
+	private const SCHEMA_VERSION = '1.3.0';
 
 	private function get_supported_post_types(): array {
 		return array_values(
@@ -74,6 +74,9 @@ class CrawlResultsRepository {
 			h1_count smallint(3) unsigned NOT NULL DEFAULT 0,
 			has_duplicate_h1 tinyint(1) unsigned NOT NULL DEFAULT 0,
 			h1_texts longtext NOT NULL,
+			image_count int(10) unsigned NOT NULL DEFAULT 0,
+			missing_image_alt_count int(10) unsigned NOT NULL DEFAULT 0,
+			missing_image_alt_details longtext NOT NULL,
 			permalink text NOT NULL,
 			score smallint(3) unsigned NOT NULL DEFAULT 0,
 			crawled_at datetime NOT NULL,
@@ -128,6 +131,9 @@ class CrawlResultsRepository {
 				'h1_count' => $data['h1_count'],
 				'has_duplicate_h1' => $data['has_duplicate_h1'],
 				'h1_texts' => $data['h1_texts'],
+				'image_count' => $data['image_count'],
+				'missing_image_alt_count' => $data['missing_image_alt_count'],
+				'missing_image_alt_details' => $data['missing_image_alt_details'],
 				'permalink' => $data['permalink'],
 				'score' => $data['score'],
 				'crawled_at' => current_time( 'mysql' ),
@@ -143,6 +149,9 @@ class CrawlResultsRepository {
 				'%s',
 				'%d',
 				'%d',
+				'%d',
+				'%d',
+				'%s',
 				'%d',
 				'%d',
 				'%s',
@@ -318,6 +327,11 @@ class CrawlResultsRepository {
 				'description' => __( 'Pages where duplicate H1 text was found.', 'arva-seo' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND has_duplicate_h1 = 1" ),
 			],
+			'image_alt_missing' => [
+				'label' => __( 'Missing Image Alt Text', 'arva-seo' ),
+				'description' => __( 'Pages where one or more images are missing alt text.', 'arva-seo' ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND missing_image_alt_count > 0" ),
+			],
 		];
 
 		return [
@@ -354,7 +368,7 @@ class CrawlResultsRepository {
 		$page = max( 1, $page );
 		$offset = ( $page - 1 ) * $per_page;
 		$sql = $wpdb->prepare(
-			"SELECT page_title, permalink, seo_title, seo_description, h1_count, has_duplicate_h1, h1_texts, score FROM {$table_name} WHERE {$where} ORDER BY score ASC, object_id ASC LIMIT %d OFFSET %d",
+			"SELECT page_title, permalink, seo_title, seo_description, h1_count, has_duplicate_h1, h1_texts, image_count, missing_image_alt_count, missing_image_alt_details, score FROM {$table_name} WHERE {$where} ORDER BY score ASC, object_id ASC LIMIT %d OFFSET %d",
 			$per_page,
 			$offset
 		);
@@ -372,6 +386,7 @@ class CrawlResultsRepository {
 			'h1_missing' => 'h1_count = 0',
 			'h1_multiple' => 'h1_count > 1',
 			'h1_duplicate' => 'has_duplicate_h1 = 1',
+			'image_alt_missing' => 'missing_image_alt_count > 0',
 		];
 
 		$where_sql = $this->get_supported_post_where_sql();

@@ -79,7 +79,7 @@ class Crawl {
 			$canonical_url = $this->seo_service->get_post_canonical_url( $post_id );
 			$robots_noindex = $this->seo_service->is_post_noindex( $post_id );
 			$robots_nofollow = $this->seo_service->is_post_nofollow( $post_id );
-			$h1_analysis = $this->analyze_post_h1s( $post_id );
+			$content_analysis = $this->analyze_post_content( $post_id );
 
 			$this->repository->upsert_result(
 				[
@@ -93,9 +93,12 @@ class Crawl {
 					'canonical_url' => $canonical_url,
 					'robots_noindex' => $robots_noindex ? 1 : 0,
 					'robots_nofollow' => $robots_nofollow ? 1 : 0,
-					'h1_count' => $h1_analysis['count'],
-					'has_duplicate_h1' => $h1_analysis['has_duplicates'] ? 1 : 0,
-					'h1_texts' => wp_json_encode( $h1_analysis['headings'] ),
+					'h1_count' => $content_analysis['h1_count'],
+					'has_duplicate_h1' => $content_analysis['has_duplicate_h1'] ? 1 : 0,
+					'h1_texts' => wp_json_encode( $content_analysis['h1_texts'] ),
+					'image_count' => $content_analysis['image_count'],
+					'missing_image_alt_count' => $content_analysis['missing_image_alt_count'],
+					'missing_image_alt_details' => wp_json_encode( $content_analysis['missing_image_alt_details'] ),
 					'permalink' => $permalink,
 					'score' => $this->resolve_score( $post_id, $seo_title, $seo_description, $canonical_url ),
 				]
@@ -210,18 +213,22 @@ class Crawl {
 		return max( 0, min( 100, $score ) );
 	}
 
-	private function analyze_post_h1s( int $post_id ): array {
+	private function analyze_post_content( int $post_id ): array {
 		$html = $this->get_rendered_content_for_analysis( $post_id );
 
 		if ( '' === trim( $html ) ) {
 			return [
-				'count' => 0,
-				'has_duplicates' => false,
-				'headings' => [],
+				'h1_count' => 0,
+				'has_duplicate_h1' => false,
+				'h1_texts' => [],
+				'image_count' => 0,
+				'missing_image_alt_count' => 0,
+				'missing_image_alt_details' => [],
 			];
 		}
 
-		$headings = $this->extract_h1_headings( $html );
+		$analysis = $this->extract_content_signals( $html );
+		$headings = $analysis['h1_texts'];
 		$normalized = array_map(
 			static fn( string $heading ): string => function_exists( 'mb_strtolower' ) ? mb_strtolower( trim( $heading ) ) : strtolower( trim( $heading ) ),
 			$headings
@@ -229,9 +236,12 @@ class Crawl {
 		$normalized = array_values( array_filter( $normalized, static fn( string $heading ): bool => '' !== $heading ) );
 
 		return [
-			'count' => count( $headings ),
-			'has_duplicates' => count( $normalized ) !== count( array_unique( $normalized ) ),
-			'headings' => $headings,
+			'h1_count' => count( $headings ),
+			'has_duplicate_h1' => count( $normalized ) !== count( array_unique( $normalized ) ),
+			'h1_texts' => $headings,
+			'image_count' => $analysis['image_count'],
+			'missing_image_alt_count' => count( $analysis['missing_image_alt_details'] ),
+			'missing_image_alt_details' => $analysis['missing_image_alt_details'],
 		];
 	}
 
@@ -285,8 +295,10 @@ class Crawl {
 		return is_string( $content ) ? $content : '';
 	}
 
-	private function extract_h1_headings( string $html ): array {
+	private function extract_content_signals( string $html ): array {
 		$headings = [];
+		$missing_image_alts = [];
+		$image_count = 0;
 		$document = new \DOMDocument();
 		$previous_state = libxml_use_internal_errors( true );
 
@@ -303,11 +315,27 @@ class Crawl {
 					$headings[] = $text;
 				}
 			}
+
+			foreach ( $document->getElementsByTagName( 'img' ) as $image ) {
+				$image_count++;
+				$alt = trim( (string) $image->getAttribute( 'alt' ) );
+
+				if ( '' !== $alt ) {
+					continue;
+				}
+
+				$source = trim( (string) $image->getAttribute( 'src' ) );
+				$missing_image_alts[] = '' !== $source ? $source : __( 'Image source unavailable', 'arva-seo' );
+			}
 		}
 
 		libxml_clear_errors();
 		libxml_use_internal_errors( $previous_state );
 
-		return $headings;
+		return [
+			'h1_texts' => $headings,
+			'image_count' => $image_count,
+			'missing_image_alt_details' => $missing_image_alts,
+		];
 	}
 }

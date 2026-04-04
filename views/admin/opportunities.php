@@ -98,6 +98,17 @@
 								$current_value = $item['seo_title'];
 							} elseif ( in_array( $selected_opportunity, [ 'description_missing', 'description_length' ], true ) ) {
 								$current_value = $item['seo_description'];
+							} elseif ( 'image_alt_missing' === $selected_opportunity ) {
+								$image_values = json_decode( (string) ( $item['missing_image_alt_details'] ?? '' ), true );
+								$image_values = is_array( $image_values ) ? array_filter( array_map( 'strval', $image_values ) ) : [];
+								$current_value = [] !== $image_values
+									? sprintf(
+										/* translators: 1: number of images missing alt text, 2: image sources */
+										__( '%1$d missing alt image(s): %2$s', 'arva-seo' ),
+										(int) ( $item['missing_image_alt_count'] ?? 0 ),
+										implode( ' | ', $image_values )
+									)
+									: __( 'No missing image alt text found', 'arva-seo' );
 							} else {
 								$h1_values = json_decode( (string) ( $item['h1_texts'] ?? '' ), true );
 								$h1_values = is_array( $h1_values ) ? array_filter( array_map( 'strval', $h1_values ) ) : [];
