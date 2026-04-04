@@ -31,7 +31,7 @@ class NullSeoService implements SeoService {
 	}
 
 	public function get_post_score( int $post_id ): int {
-		return 0;
+		return -1;
 	}
 
 	public function get_post_canonical_url( int $post_id ): string {

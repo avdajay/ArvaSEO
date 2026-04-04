@@ -30,7 +30,7 @@ class RankMath extends AbstractSeoProvider {
 	public function get_post_score( int $post_id ): int {
 		$score = get_post_meta( $post_id, 'rank_math_seo_score', true );
 
-		return is_numeric( $score ) ? max( 0, min( 100, (int) $score ) ) : 0;
+		return is_numeric( $score ) ? max( 0, min( 100, (int) $score ) ) : -1;
 	}
 
 	public function get_post_canonical_url( int $post_id ): string {

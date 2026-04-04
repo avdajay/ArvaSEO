@@ -100,7 +100,7 @@
 					setStateMeta( summary );
 					setProgress(
 						summary.percentage || 0,
-						'Processed ' + ( summary.processed || 0 ) + ' of ' + ( summary.total || 0 ) + ' pages. Skipped ' + ( summary.skipped_count || 0 ) + ', errors ' + ( summary.error_count || 0 ) + '.'
+						'Processed ' + ( summary.processed || 0 ) + ' of ' + ( summary.total || 0 ) + ' pages. Errors ' + ( summary.error_count || 0 ) + '.'
 					);
 
 					if ( summary.done ) {

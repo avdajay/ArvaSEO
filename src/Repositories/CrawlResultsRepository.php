@@ -8,6 +8,34 @@ class CrawlResultsRepository {
 
 	private const SCHEMA_VERSION = '1.1.0';
 
+	private function get_supported_post_types(): array {
+		return array_values(
+			array_filter(
+				[
+					post_type_exists( 'post' ) ? 'post' : null,
+					post_type_exists( 'page' ) ? 'page' : null,
+					post_type_exists( 'product' ) ? 'product' : null,
+				]
+			)
+		);
+	}
+
+	private function get_supported_post_where_sql( string $table_alias = '' ): string {
+		$post_types = $this->get_supported_post_types();
+		$column_prefix = '' !== $table_alias ? "{$table_alias}." : '';
+
+		if ( [] === $post_types ) {
+			return "{$column_prefix}object_type = 'post' AND 1 = 0";
+		}
+
+		$quoted_post_types = array_map(
+			static fn( string $post_type ): string => "'" . esc_sql( $post_type ) . "'",
+			$post_types
+		);
+
+		return "{$column_prefix}object_type = 'post' AND {$column_prefix}post_type IN (" . implode( ', ', $quoted_post_types ) . ')';
+	}
+
 	public function get_table_name(): string {
 		global $wpdb;
 
@@ -69,6 +97,15 @@ class CrawlResultsRepository {
 		$wpdb->query( "TRUNCATE TABLE {$this->get_table_name()}" );
 	}
 
+	public function delete_unsupported_post_type_results(): void {
+		global $wpdb;
+
+		$table_name = $this->get_table_name();
+		$where_sql = $this->get_supported_post_where_sql();
+
+		$wpdb->query( "DELETE FROM {$table_name} WHERE object_type <> 'post' OR NOT ( {$where_sql} )" );
+	}
+
 	public function upsert_result( array $data ): void {
 		global $wpdb;
 
@@ -115,15 +152,16 @@ class CrawlResultsRepository {
 		global $wpdb;
 
 		$table_name = $this->get_table_name();
+		$where_sql = $this->get_supported_post_where_sql();
 		$search = trim( $search );
 
 		if ( '' === $search ) {
-			return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
+			return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql}" );
 		}
 
 		$like = '%' . $wpdb->esc_like( $search ) . '%';
 		$sql = $wpdb->prepare(
-			"SELECT COUNT(*) FROM {$table_name} WHERE page_title LIKE %s OR permalink LIKE %s",
+			"SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND ( page_title LIKE %s OR permalink LIKE %s )",
 			$like,
 			$like
 		);
@@ -135,7 +173,8 @@ class CrawlResultsRepository {
 		global $wpdb;
 
 		$table_name = $this->get_table_name();
-		$value = $wpdb->get_var( "SELECT MAX(crawled_at) FROM {$table_name}" );
+		$where_sql = $this->get_supported_post_where_sql();
+		$value = $wpdb->get_var( "SELECT MAX(crawled_at) FROM {$table_name} WHERE {$where_sql}" );
 
 		return is_string( $value ) && '' !== $value ? $value : null;
 	}
@@ -166,18 +205,21 @@ class CrawlResultsRepository {
 		$page = max( 1, $page );
 		$offset = ( $page - 1 ) * $per_page;
 		$table_name = $this->get_table_name();
+		$posts_table = $wpdb->posts;
+		$where_sql = $this->get_supported_post_where_sql( 'crawl' );
 		$search = trim( $search );
+		$order_sql = 'ORDER BY posts.post_date DESC, posts.ID DESC';
 
 		if ( '' === $search ) {
 			$sql = $wpdb->prepare(
-				"SELECT * FROM {$table_name} ORDER BY score ASC, crawled_at DESC, object_id DESC LIMIT %d OFFSET %d",
+				"SELECT crawl.* FROM {$table_name} AS crawl INNER JOIN {$posts_table} AS posts ON posts.ID = crawl.object_id WHERE {$where_sql} {$order_sql} LIMIT %d OFFSET %d",
 				$per_page,
 				$offset
 			);
 		} else {
 			$like = '%' . $wpdb->esc_like( $search ) . '%';
 			$sql = $wpdb->prepare(
-				"SELECT * FROM {$table_name} WHERE page_title LIKE %s OR permalink LIKE %s ORDER BY score ASC, crawled_at DESC, object_id DESC LIMIT %d OFFSET %d",
+				"SELECT crawl.* FROM {$table_name} AS crawl INNER JOIN {$posts_table} AS posts ON posts.ID = crawl.object_id WHERE {$where_sql} AND ( crawl.page_title LIKE %s OR crawl.permalink LIKE %s ) {$order_sql} LIMIT %d OFFSET %d",
 				$like,
 				$like,
 				$per_page,
@@ -194,14 +236,17 @@ class CrawlResultsRepository {
 		global $wpdb;
 
 		$table_name = $this->get_table_name();
+		$posts_table = $wpdb->posts;
+		$where_sql = $this->get_supported_post_where_sql();
 		$search = trim( $search );
+		$order_sql = 'ORDER BY posts.post_date DESC, posts.ID DESC';
 
 		if ( '' === $search ) {
-			$sql = "SELECT permalink, seo_title, seo_description, canonical_url, robots_nofollow, robots_noindex FROM {$table_name} ORDER BY object_id ASC";
+			$sql = "SELECT crawl.permalink, crawl.seo_title, crawl.seo_description, crawl.canonical_url, crawl.robots_nofollow, crawl.robots_noindex FROM {$table_name} AS crawl INNER JOIN {$posts_table} AS posts ON posts.ID = crawl.object_id WHERE " . $this->get_supported_post_where_sql( 'crawl' ) . " {$order_sql}";
 		} else {
 			$like = '%' . $wpdb->esc_like( $search ) . '%';
 			$sql = $wpdb->prepare(
-				"SELECT permalink, seo_title, seo_description, canonical_url, robots_nofollow, robots_noindex FROM {$table_name} WHERE page_title LIKE %s OR permalink LIKE %s ORDER BY object_id ASC",
+				"SELECT crawl.permalink, crawl.seo_title, crawl.seo_description, crawl.canonical_url, crawl.robots_nofollow, crawl.robots_noindex FROM {$table_name} AS crawl INNER JOIN {$posts_table} AS posts ON posts.ID = crawl.object_id WHERE " . $this->get_supported_post_where_sql( 'crawl' ) . " AND ( crawl.page_title LIKE %s OR crawl.permalink LIKE %s ) {$order_sql}",
 				$like,
 				$like
 			);
@@ -216,37 +261,38 @@ class CrawlResultsRepository {
 		global $wpdb;
 
 		$table_name = $this->get_table_name();
+		$where_sql = $this->get_supported_post_where_sql();
 		$totals = $wpdb->get_row(
-			"SELECT COUNT(*) AS total_pages, COALESCE(AVG(score), 0) AS average_score FROM {$table_name}",
+			"SELECT COUNT(*) AS total_pages, COALESCE(AVG(score), 0) AS average_score FROM {$table_name} WHERE {$where_sql}",
 			ARRAY_A
 		);
 
 		$score_bands = [
-			'critical' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE score < 50" ),
-			'warning' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE score BETWEEN 50 AND 79" ),
-			'healthy' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE score >= 80" ),
+			'critical' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score < 50" ),
+			'warning' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score BETWEEN 50 AND 74" ),
+			'healthy' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score >= 75" ),
 		];
 
 		$opportunities = [
 			'title_missing' => [
 				'label' => __( 'Missing SEO Titles', 'arva-seo' ),
 				'description' => __( 'Pages with no SEO title set.', 'arva-seo' ),
-				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE seo_title = ''" ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_title = ''" ),
 			],
 			'title_length' => [
 				'label' => __( 'SEO Titles Out Of Range', 'arva-seo' ),
 				'description' => __( 'Titles shorter than 30 or longer than 60 characters.', 'arva-seo' ),
-				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE seo_title <> '' AND (CHAR_LENGTH(seo_title) < 30 OR CHAR_LENGTH(seo_title) > 60)" ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_title <> '' AND (CHAR_LENGTH(seo_title) < 30 OR CHAR_LENGTH(seo_title) > 60)" ),
 			],
 			'description_missing' => [
 				'label' => __( 'Missing Meta Descriptions', 'arva-seo' ),
 				'description' => __( 'Pages with no meta description set.', 'arva-seo' ),
-				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE seo_description = ''" ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_description = ''" ),
 			],
 			'description_length' => [
 				'label' => __( 'Descriptions Out Of Range', 'arva-seo' ),
 				'description' => __( 'Descriptions shorter than 120 or longer than 160 characters.', 'arva-seo' ),
-				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE seo_description <> '' AND (CHAR_LENGTH(seo_description) < 120 OR CHAR_LENGTH(seo_description) > 160)" ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_description <> '' AND (CHAR_LENGTH(seo_description) < 120 OR CHAR_LENGTH(seo_description) > 160)" ),
 			],
 		];
 

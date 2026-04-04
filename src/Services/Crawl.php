@@ -39,30 +39,23 @@ class Crawl {
 
 	public function crawl_batch( ?int $limit = null, bool $start = false ): array {
 		$provider = $this->seo_service->get_provider_name();
-		$post_ids = $this->get_public_post_ids();
+		$post_ids = $this->get_crawl_post_ids();
 		$total = count( $post_ids );
 		$limit = null === $limit ? $this->get_default_chunk_size() : max( 1, $limit );
 		$state = $this->state_repository->get_state();
 
 		if ( $start || $provider !== $state['provider'] || ! in_array( $state['status'], [ 'running', 'paused' ], true ) ) {
+			$this->repository->delete_unsupported_post_type_results();
 			$state = $this->state_repository->reset_state( $provider, $total );
 		}
 
 		$offset = max( 0, (int) $state['current_offset'] );
 		$batch_post_ids = array_slice( $post_ids, $offset, $limit );
-		$existing_object_ids = $this->repository->get_existing_object_ids( $provider, 'post', $batch_post_ids );
-		$existing_lookup = array_fill_keys( $existing_object_ids, true );
 		$crawled_in_batch = 0;
-		$skipped_in_batch = 0;
 		$error_in_batch = 0;
 		$last_error = '';
 
 		foreach ( $batch_post_ids as $post_id ) {
-			if ( isset( $existing_lookup[ $post_id ] ) ) {
-				$skipped_in_batch++;
-				continue;
-			}
-
 			$permalink = get_permalink( $post_id );
 
 			if ( ! is_string( $permalink ) || '' === $permalink ) {
@@ -81,6 +74,11 @@ class Crawl {
 
 			$page_title = get_the_title( $post_id );
 			$page_title = is_string( $page_title ) ? $page_title : '';
+			$seo_title = (string) ( $seo_data['title'] ?? '' );
+			$seo_description = (string) ( $seo_data['description'] ?? '' );
+			$canonical_url = $this->seo_service->get_post_canonical_url( $post_id );
+			$robots_noindex = $this->seo_service->is_post_noindex( $post_id );
+			$robots_nofollow = $this->seo_service->is_post_nofollow( $post_id );
 
 			$this->repository->upsert_result(
 				[
@@ -89,13 +87,13 @@ class Crawl {
 					'object_id' => $post_id,
 					'post_type' => (string) get_post_type( $post_id ),
 					'page_title' => $page_title,
-					'seo_title' => (string) ( $seo_data['title'] ?? '' ),
-					'seo_description' => (string) ( $seo_data['description'] ?? '' ),
-					'canonical_url' => $this->seo_service->get_post_canonical_url( $post_id ),
-					'robots_noindex' => $this->seo_service->is_post_noindex( $post_id ) ? 1 : 0,
-					'robots_nofollow' => $this->seo_service->is_post_nofollow( $post_id ) ? 1 : 0,
+					'seo_title' => $seo_title,
+					'seo_description' => $seo_description,
+					'canonical_url' => $canonical_url,
+					'robots_noindex' => $robots_noindex ? 1 : 0,
+					'robots_nofollow' => $robots_nofollow ? 1 : 0,
 					'permalink' => $permalink,
-					'score' => $this->seo_service->get_post_score( $post_id ),
+					'score' => $this->resolve_score( $post_id, $seo_title, $seo_description, $canonical_url ),
 				]
 			);
 
@@ -113,7 +111,7 @@ class Crawl {
 				'total' => $total,
 				'percentage' => $total > 0 ? (int) floor( ( $processed / $total ) * 100 ) : 100,
 				'crawled_count' => (int) $state['crawled_count'] + $crawled_in_batch,
-				'skipped_count' => (int) $state['skipped_count'] + $skipped_in_batch,
+				'skipped_count' => (int) $state['skipped_count'],
 				'error_count' => (int) $state['error_count'] + $error_in_batch,
 				'last_error' => $last_error,
 			]
@@ -140,19 +138,24 @@ class Crawl {
 		];
 	}
 
-	private function get_public_post_ids(): array {
-		$post_types = get_post_types(
-			[
-				'public' => true,
-			],
-			'names'
+	private function get_crawl_post_ids(): array {
+		$post_types = array_values(
+			array_filter(
+				[
+					post_type_exists( 'post' ) ? 'post' : null,
+					post_type_exists( 'page' ) ? 'page' : null,
+					post_type_exists( 'product' ) ? 'product' : null,
+				]
+			)
 		);
 
-		unset( $post_types['attachment'] );
+		if ( [] === $post_types ) {
+			return [];
+		}
 
 		$post_ids = get_posts(
 			[
-				'post_type' => array_values( $post_types ),
+				'post_type' => $post_types,
 				'post_status' => 'publish',
 				'posts_per_page' => -1,
 				'fields' => 'ids',
@@ -163,5 +166,43 @@ class Crawl {
 		);
 
 		return is_array( $post_ids ) ? array_map( 'intval', $post_ids ) : [];
+	}
+
+	private function resolve_score( int $post_id, string $seo_title, string $seo_description, string $canonical_url ): int {
+		$provider_score = $this->seo_service->get_post_score( $post_id );
+
+		if ( $provider_score >= 0 ) {
+			return min( 100, $provider_score );
+		}
+
+		return $this->calculate_fallback_score( $seo_title, $seo_description, $canonical_url );
+	}
+
+	private function calculate_fallback_score( string $seo_title, string $seo_description, string $canonical_url ): int {
+		$score = 0;
+		$title_length = function_exists( 'mb_strlen' ) ? mb_strlen( trim( $seo_title ) ) : strlen( trim( $seo_title ) );
+		$description_length = function_exists( 'mb_strlen' ) ? mb_strlen( trim( $seo_description ) ) : strlen( trim( $seo_description ) );
+
+		if ( $title_length > 0 ) {
+			$score += 30;
+		}
+
+		if ( $title_length >= 30 && $title_length <= 60 ) {
+			$score += 20;
+		}
+
+		if ( $description_length > 0 ) {
+			$score += 30;
+		}
+
+		if ( $description_length >= 120 && $description_length <= 160 ) {
+			$score += 20;
+		}
+
+		if ( '' !== trim( $canonical_url ) ) {
+			$score += 20;
+		}
+
+		return max( 0, min( 100, $score ) );
 	}
 }

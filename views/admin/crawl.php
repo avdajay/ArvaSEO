@@ -66,16 +66,14 @@
             <p class="arva-seo-summary-meta">
 				<?php
 				if ( $last_crawled_at ) {
+					$last_crawl_datetime = date_create_immutable_from_format( 'Y-m-d H:i:s', $last_crawled_at, wp_timezone() );
+					$last_crawl_display = $last_crawl_datetime
+						? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_crawl_datetime->getTimestamp(), wp_timezone() )
+						: $last_crawled_at;
 					printf(
 						'%s %s',
 						esc_html__( 'Last crawl:', 'arva-seo' ),
-						esc_html(
-							sprintf(
-								'%s %s',
-								wp_date( get_option( 'date_format' ), strtotime( $last_crawled_at ) ),
-								wp_date( get_option( 'time_format' ), strtotime( $last_crawled_at ) )
-							)
-						)
+						esc_html( $last_crawl_display )
 					);
 				} else {
 					esc_html_e( 'Last crawl: Never', 'arva-seo' );

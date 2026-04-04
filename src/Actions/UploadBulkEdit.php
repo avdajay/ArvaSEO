@@ -62,6 +62,10 @@ class UploadBulkEdit {
 				continue;
 			}
 
+			if ( ! $this->is_supported_post_type( $post_id ) ) {
+				continue;
+			}
+
 			$new_values = [
 				'title' => $this->normalize_text_value( $row['title'] ?? null ),
 				'description' => $this->normalize_text_value( $row['description'] ?? null ),
@@ -156,6 +160,12 @@ class UploadBulkEdit {
 		}
 
 		return false;
+	}
+
+	private function is_supported_post_type( int $post_id ): bool {
+		$post_type = get_post_type( $post_id );
+
+		return in_array( $post_type, [ 'post', 'page', 'product' ], true );
 	}
 
 	private function redirect_with_notice( string $notice ): void {
