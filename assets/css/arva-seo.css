@@ -709,8 +709,18 @@ body.arva-seo_page_arva-seo-settings #wpbody h3 {
     background: #e6a93d;
 }
 
+.arva-seo-op-bar-good {
+    background: #6aaf56;
+}
+
 .arva-seo-op-bar-healthy {
     background: #2ca049;
+}
+
+.arva-seo-op-bar-group small {
+    color: #49614f;
+    font-size: 11px;
+    line-height: 1;
 }
 
 .arva-seo-opportunities-list {

@@ -292,9 +292,26 @@ class CrawlResultsRepository {
 		);
 
 		$score_bands = [
-			'critical' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score < 50" ),
-			'warning' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score BETWEEN 50 AND 74" ),
-			'healthy' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score >= 75" ),
+			'critical' => [
+				'label' => __( 'Critical', 'arva-seo' ),
+				'range' => '0-39',
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score < 40" ),
+			],
+			'warning' => [
+				'label' => __( 'Needs Work', 'arva-seo' ),
+				'range' => '40-59',
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score BETWEEN 40 AND 59" ),
+			],
+			'good' => [
+				'label' => __( 'Good', 'arva-seo' ),
+				'range' => '60-79',
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score BETWEEN 60 AND 79" ),
+			],
+			'healthy' => [
+				'label' => __( 'Strong', 'arva-seo' ),
+				'range' => '80-100',
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score >= 80" ),
+			],
 		];
 
 		$opportunities = [

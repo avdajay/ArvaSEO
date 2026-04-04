@@ -103,7 +103,7 @@ class Crawl {
 					'missing_image_alt_count' => $content_analysis['missing_image_alt_count'],
 					'missing_image_alt_details' => wp_json_encode( $content_analysis['missing_image_alt_details'] ),
 					'permalink' => $permalink,
-					'score' => $this->resolve_score( $post_id, $seo_title, $seo_description, $canonical_url ),
+					'score' => $this->resolve_score( $post_id, $seo_title, $seo_description, $canonical_url, $content_analysis ),
 				]
 			);
 
@@ -178,39 +178,61 @@ class Crawl {
 		return is_array( $post_ids ) ? array_map( 'intval', $post_ids ) : [];
 	}
 
-	private function resolve_score( int $post_id, string $seo_title, string $seo_description, string $canonical_url ): int {
+	private function resolve_score( int $post_id, string $seo_title, string $seo_description, string $canonical_url, array $content_analysis ): int {
 		$provider_score = $this->seo_service->get_post_score( $post_id );
+		$content_score = $this->calculate_content_quality_score( $seo_title, $seo_description, $canonical_url, $content_analysis );
 
 		if ( $provider_score >= 0 ) {
-			return min( 100, $provider_score );
+			return max( 0, min( 100, (int) round( ( $provider_score * 0.7 ) + ( $content_score * 0.3 ) ) ) );
 		}
 
-		return $this->calculate_fallback_score( $seo_title, $seo_description, $canonical_url );
+		return $content_score;
 	}
 
-	private function calculate_fallback_score( string $seo_title, string $seo_description, string $canonical_url ): int {
+	private function calculate_content_quality_score( string $seo_title, string $seo_description, string $canonical_url, array $content_analysis ): int {
 		$score = 0;
 		$title_length = function_exists( 'mb_strlen' ) ? mb_strlen( trim( $seo_title ) ) : strlen( trim( $seo_title ) );
 		$description_length = function_exists( 'mb_strlen' ) ? mb_strlen( trim( $seo_description ) ) : strlen( trim( $seo_description ) );
+		$h1_count = isset( $content_analysis['h1_count'] ) ? (int) $content_analysis['h1_count'] : 0;
+		$has_duplicate_h1 = ! empty( $content_analysis['has_duplicate_h1'] );
+		$image_count = isset( $content_analysis['image_count'] ) ? (int) $content_analysis['image_count'] : 0;
+		$missing_image_alt_count = isset( $content_analysis['missing_image_alt_count'] ) ? (int) $content_analysis['missing_image_alt_count'] : 0;
 
 		if ( $title_length > 0 ) {
-			$score += 30;
+			$score += 18;
 		}
 
 		if ( $title_length >= 30 && $title_length <= 60 ) {
-			$score += 20;
+			$score += 12;
 		}
 
 		if ( $description_length > 0 ) {
-			$score += 30;
+			$score += 18;
 		}
 
 		if ( $description_length >= 120 && $description_length <= 160 ) {
-			$score += 20;
+			$score += 12;
 		}
 
 		if ( '' !== trim( $canonical_url ) ) {
-			$score += 20;
+			$score += 10;
+		}
+
+		if ( 1 === $h1_count ) {
+			$score += 15;
+		} elseif ( $h1_count > 1 ) {
+			$score += 5;
+		}
+
+		if ( $h1_count > 0 && ! $has_duplicate_h1 ) {
+			$score += 5;
+		}
+
+		if ( $image_count <= 0 ) {
+			$score += 10;
+		} else {
+			$images_with_alt = max( 0, $image_count - $missing_image_alt_count );
+			$score += (int) round( min( 10, ( $images_with_alt / max( 1, $image_count ) ) * 10 ) );
 		}
 
 		return max( 0, min( 100, $score ) );

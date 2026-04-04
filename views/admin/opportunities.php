@@ -36,18 +36,14 @@
             <div class="arva-seo-op-bars">
 				<?php foreach ( $dashboard['score_bands'] as $band => $count ) : ?>
 					<?php
-					$label_map = [
-						'critical' => __( 'Critical', 'arva-seo' ),
-						'warning' => __( 'Needs Work', 'arva-seo' ),
-						'healthy' => __( 'Healthy', 'arva-seo' ),
-					];
-					$max_band = max( 1, max( $dashboard['score_bands'] ) );
-					$height = (int) max( 18, round( ( $count / $max_band ) * 120 ) );
+					$max_band = max( 1, max( array_column( $dashboard['score_bands'], 'count' ) ) );
+					$height = (int) max( 18, round( ( $count['count'] / $max_band ) * 120 ) );
 					?>
                     <div class="arva-seo-op-bar-group">
                         <div class="arva-seo-op-bar arva-seo-op-bar-<?php echo esc_attr( $band ); ?>" style="height: <?php echo esc_attr( $height ); ?>px;"></div>
-                        <strong><?php echo esc_html( $count ); ?></strong>
-                        <span><?php echo esc_html( $label_map[ $band ] ); ?></span>
+                        <strong><?php echo esc_html( $count['count'] ); ?></strong>
+                        <span><?php echo esc_html( $count['label'] ); ?></span>
+                        <small><?php echo esc_html( $count['range'] ); ?></small>
                     </div>
 				<?php endforeach; ?>
             </div>
