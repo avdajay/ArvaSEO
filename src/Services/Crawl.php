@@ -79,6 +79,7 @@ class Crawl {
 			$canonical_url = $this->seo_service->get_post_canonical_url( $post_id );
 			$robots_noindex = $this->seo_service->is_post_noindex( $post_id );
 			$robots_nofollow = $this->seo_service->is_post_nofollow( $post_id );
+			$h1_analysis = $this->analyze_post_h1s( $post_id );
 
 			$this->repository->upsert_result(
 				[
@@ -92,6 +93,9 @@ class Crawl {
 					'canonical_url' => $canonical_url,
 					'robots_noindex' => $robots_noindex ? 1 : 0,
 					'robots_nofollow' => $robots_nofollow ? 1 : 0,
+					'h1_count' => $h1_analysis['count'],
+					'has_duplicate_h1' => $h1_analysis['has_duplicates'] ? 1 : 0,
+					'h1_texts' => wp_json_encode( $h1_analysis['headings'] ),
 					'permalink' => $permalink,
 					'score' => $this->resolve_score( $post_id, $seo_title, $seo_description, $canonical_url ),
 				]
@@ -204,5 +208,106 @@ class Crawl {
 		}
 
 		return max( 0, min( 100, $score ) );
+	}
+
+	private function analyze_post_h1s( int $post_id ): array {
+		$html = $this->get_rendered_content_for_analysis( $post_id );
+
+		if ( '' === trim( $html ) ) {
+			return [
+				'count' => 0,
+				'has_duplicates' => false,
+				'headings' => [],
+			];
+		}
+
+		$headings = $this->extract_h1_headings( $html );
+		$normalized = array_map(
+			static fn( string $heading ): string => function_exists( 'mb_strtolower' ) ? mb_strtolower( trim( $heading ) ) : strtolower( trim( $heading ) ),
+			$headings
+		);
+		$normalized = array_values( array_filter( $normalized, static fn( string $heading ): bool => '' !== $heading ) );
+
+		return [
+			'count' => count( $headings ),
+			'has_duplicates' => count( $normalized ) !== count( array_unique( $normalized ) ),
+			'headings' => $headings,
+		];
+	}
+
+	private function get_rendered_content_for_analysis( int $post_id ): string {
+		$elementor_content = $this->get_elementor_content( $post_id );
+
+		if ( '' !== $elementor_content ) {
+			return $elementor_content;
+		}
+
+		$post = get_post( $post_id );
+
+		if ( ! $post instanceof \WP_Post ) {
+			return '';
+		}
+
+		$previous_post = $GLOBALS['post'] ?? null;
+		$GLOBALS['post'] = $post;
+		setup_postdata( $post );
+		$content = apply_filters( 'the_content', $post->post_content );
+		wp_reset_postdata();
+
+		if ( null !== $previous_post ) {
+			$GLOBALS['post'] = $previous_post;
+		} else {
+			unset( $GLOBALS['post'] );
+		}
+
+		return is_string( $content ) ? $content : '';
+	}
+
+	private function get_elementor_content( int $post_id ): string {
+		if ( ! class_exists( '\Elementor\Plugin' ) ) {
+			return '';
+		}
+
+		$plugin = \Elementor\Plugin::$instance ?? null;
+
+		if ( ! $plugin || ! isset( $plugin->documents, $plugin->frontend ) ) {
+			return '';
+		}
+
+		$document = $plugin->documents->get( $post_id );
+
+		if ( ! $document || ! method_exists( $document, 'is_built_with_elementor' ) || ! $document->is_built_with_elementor() ) {
+			return '';
+		}
+
+		$content = $plugin->frontend->get_builder_content( $post_id, true );
+
+		return is_string( $content ) ? $content : '';
+	}
+
+	private function extract_h1_headings( string $html ): array {
+		$headings = [];
+		$document = new \DOMDocument();
+		$previous_state = libxml_use_internal_errors( true );
+
+		$loaded = $document->loadHTML(
+			'<?xml encoding="utf-8" ?>' . $html,
+			LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+		);
+
+		if ( false !== $loaded ) {
+			foreach ( $document->getElementsByTagName( 'h1' ) as $heading ) {
+				$text = trim( wp_strip_all_tags( $heading->textContent ) );
+
+				if ( '' !== $text ) {
+					$headings[] = $text;
+				}
+			}
+		}
+
+		libxml_clear_errors();
+		libxml_use_internal_errors( $previous_state );
+
+		return $headings;
 	}
 }

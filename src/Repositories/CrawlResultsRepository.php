@@ -6,7 +6,7 @@ use wpdb;
 
 class CrawlResultsRepository {
 
-	private const SCHEMA_VERSION = '1.1.0';
+	private const SCHEMA_VERSION = '1.2.0';
 
 	private function get_supported_post_types(): array {
 		return array_values(
@@ -71,6 +71,9 @@ class CrawlResultsRepository {
 			canonical_url text NOT NULL,
 			robots_noindex tinyint(1) unsigned NOT NULL DEFAULT 0,
 			robots_nofollow tinyint(1) unsigned NOT NULL DEFAULT 0,
+			h1_count smallint(3) unsigned NOT NULL DEFAULT 0,
+			has_duplicate_h1 tinyint(1) unsigned NOT NULL DEFAULT 0,
+			h1_texts longtext NOT NULL,
 			permalink text NOT NULL,
 			score smallint(3) unsigned NOT NULL DEFAULT 0,
 			crawled_at datetime NOT NULL,
@@ -122,6 +125,9 @@ class CrawlResultsRepository {
 				'canonical_url' => $data['canonical_url'],
 				'robots_noindex' => $data['robots_noindex'],
 				'robots_nofollow' => $data['robots_nofollow'],
+				'h1_count' => $data['h1_count'],
+				'has_duplicate_h1' => $data['has_duplicate_h1'],
+				'h1_texts' => $data['h1_texts'],
 				'permalink' => $data['permalink'],
 				'score' => $data['score'],
 				'crawled_at' => current_time( 'mysql' ),
@@ -137,6 +143,9 @@ class CrawlResultsRepository {
 				'%s',
 				'%d',
 				'%d',
+				'%d',
+				'%d',
+				'%s',
 				'%s',
 				'%d',
 				'%s',
@@ -294,6 +303,21 @@ class CrawlResultsRepository {
 				'description' => __( 'Descriptions shorter than 120 or longer than 160 characters.', 'arva-seo' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_description <> '' AND (CHAR_LENGTH(seo_description) < 120 OR CHAR_LENGTH(seo_description) > 160)" ),
 			],
+			'h1_missing' => [
+				'label' => __( 'Missing H1 Headings', 'arva-seo' ),
+				'description' => __( 'Pages where no H1 heading was found in the rendered content.', 'arva-seo' ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND h1_count = 0" ),
+			],
+			'h1_multiple' => [
+				'label' => __( 'Multiple H1 Headings', 'arva-seo' ),
+				'description' => __( 'Pages where more than one H1 heading was found.', 'arva-seo' ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND h1_count > 1" ),
+			],
+			'h1_duplicate' => [
+				'label' => __( 'Duplicate H1 Headings', 'arva-seo' ),
+				'description' => __( 'Pages where duplicate H1 text was found.', 'arva-seo' ),
+				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND has_duplicate_h1 = 1" ),
+			],
 		];
 
 		return [
@@ -330,7 +354,7 @@ class CrawlResultsRepository {
 		$page = max( 1, $page );
 		$offset = ( $page - 1 ) * $per_page;
 		$sql = $wpdb->prepare(
-			"SELECT page_title, permalink, seo_title, seo_description, score FROM {$table_name} WHERE {$where} ORDER BY score ASC, object_id ASC LIMIT %d OFFSET %d",
+			"SELECT page_title, permalink, seo_title, seo_description, h1_count, has_duplicate_h1, h1_texts, score FROM {$table_name} WHERE {$where} ORDER BY score ASC, object_id ASC LIMIT %d OFFSET %d",
 			$per_page,
 			$offset
 		);
@@ -345,8 +369,14 @@ class CrawlResultsRepository {
 			'title_length' => "seo_title <> '' AND (CHAR_LENGTH(seo_title) < 30 OR CHAR_LENGTH(seo_title) > 60)",
 			'description_missing' => "seo_description = ''",
 			'description_length' => "seo_description <> '' AND (CHAR_LENGTH(seo_description) < 120 OR CHAR_LENGTH(seo_description) > 160)",
+			'h1_missing' => 'h1_count = 0',
+			'h1_multiple' => 'h1_count > 1',
+			'h1_duplicate' => 'has_duplicate_h1 = 1',
 		];
 
-		return $map[ $type ] ?? '';
+		$where_sql = $this->get_supported_post_where_sql();
+		$clause = $map[ $type ] ?? '';
+
+		return '' !== $clause ? "{$where_sql} AND {$clause}" : '';
 	}
 }

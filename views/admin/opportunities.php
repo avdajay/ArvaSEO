@@ -94,9 +94,17 @@
                         </div>
                         <div>
 							<?php
-							$current_value = in_array( $selected_opportunity, [ 'title_missing', 'title_length' ], true )
-								? $item['seo_title']
-								: $item['seo_description'];
+							if ( in_array( $selected_opportunity, [ 'title_missing', 'title_length' ], true ) ) {
+								$current_value = $item['seo_title'];
+							} elseif ( in_array( $selected_opportunity, [ 'description_missing', 'description_length' ], true ) ) {
+								$current_value = $item['seo_description'];
+							} else {
+								$h1_values = json_decode( (string) ( $item['h1_texts'] ?? '' ), true );
+								$h1_values = is_array( $h1_values ) ? array_filter( array_map( 'strval', $h1_values ) ) : [];
+								$current_value = [] !== $h1_values
+									? implode( ' | ', $h1_values )
+									: __( 'No H1 found', 'arva-seo' );
+							}
 							echo esc_html( '' !== $current_value ? $current_value : __( 'Not set', 'arva-seo' ) );
 							?>
                         </div>
