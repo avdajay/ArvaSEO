@@ -20,7 +20,7 @@ class SettingsRepository {
 			[
 				'crawl_batch_size' => self::MIN_BATCH_SIZE,
 				'bulk_edit_batch_size' => self::MIN_BATCH_SIZE,
-				'delete_data_on_uninstall' => false,
+				'delete_data_on_deactivation' => ! empty( $settings['delete_data_on_uninstall'] ),
 			]
 		);
 	}
@@ -29,7 +29,7 @@ class SettingsRepository {
 		$normalized = [
 			'crawl_batch_size' => $this->normalize_batch_size( $settings['crawl_batch_size'] ?? self::MIN_BATCH_SIZE ),
 			'bulk_edit_batch_size' => $this->normalize_batch_size( $settings['bulk_edit_batch_size'] ?? self::MIN_BATCH_SIZE ),
-			'delete_data_on_uninstall' => ! empty( $settings['delete_data_on_uninstall'] ),
+			'delete_data_on_deactivation' => ! empty( $settings['delete_data_on_deactivation'] ?? $settings['delete_data_on_uninstall'] ),
 		];
 
 		update_option( self::OPTION_KEY, $normalized, false );
@@ -49,10 +49,10 @@ class SettingsRepository {
 		return $this->normalize_batch_size( $settings['bulk_edit_batch_size'] ?? self::MIN_BATCH_SIZE );
 	}
 
-	public function should_delete_on_uninstall(): bool {
+	public function should_delete_on_deactivation(): bool {
 		$settings = $this->get_settings();
 
-		return ! empty( $settings['delete_data_on_uninstall'] );
+		return ! empty( $settings['delete_data_on_deactivation'] );
 	}
 
 	public function normalize_batch_size( $value ): int {

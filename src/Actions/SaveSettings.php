@@ -23,7 +23,7 @@ class SaveSettings {
 			[
 				'crawl_batch_size' => isset( $_POST['crawl_batch_size'] ) ? wp_unslash( $_POST['crawl_batch_size'] ) : null,
 				'bulk_edit_batch_size' => isset( $_POST['bulk_edit_batch_size'] ) ? wp_unslash( $_POST['bulk_edit_batch_size'] ) : null,
-				'delete_data_on_uninstall' => isset( $_POST['delete_data_on_uninstall'] ) ? wp_unslash( $_POST['delete_data_on_uninstall'] ) : null,
+				'delete_data_on_deactivation' => isset( $_POST['delete_data_on_deactivation'] ) ? wp_unslash( $_POST['delete_data_on_deactivation'] ) : null,
 			]
 		);
 
