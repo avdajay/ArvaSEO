@@ -48,6 +48,45 @@ use ArvaSeo\Core\Activator;
 use ArvaSeo\Core\Deactivator;
 use ArvaSeo\Core\Bootstrap;
 
+if ( ! function_exists( 'arva_seo_fs' ) ) {
+	// Create a helper function for easy SDK access.
+	function arva_seo_fs() {
+		global $arva_seo_fs;
+
+		if ( ! isset( $arva_seo_fs ) ) {
+			// Include Freemius SDK.
+			// SDK is auto-loaded through Composer
+
+			$arva_seo_fs = fs_dynamic_init( array(
+				'id'                  => '27093',
+				'slug'                => 'arva-seo',
+				'type'                => 'plugin',
+				'public_key'          => 'pk_507e765c3b97b9658ad21d6e560e6',
+				'is_premium'          => true,
+				'premium_suffix'      => 'Professional',
+				// If your plugin is a serviceware, set this option to false.
+				'has_premium_version' => true,
+				'has_addons'          => false,
+				'has_paid_plans'      => true,
+				'is_org_compliant'    => true,
+				// Automatically removed in the free version. If you're not using the
+				// auto-generated free version, delete this line before uploading to wp.org.
+				'wp_org_gatekeeper'   => 'OA7#BoRiBNqdf52FvzEf!!074aRLPs8fspif$7K1#4u4Csys1fQlCecVcUTOs2mcpeVHi#C2j9d09fOTvbC0HloPT7fFee5WdS3G',
+				'menu'                => array(
+					'slug'           => 'arva-seo',
+				),
+			) );
+		}
+
+		return $arva_seo_fs;
+	}
+
+	// Init Freemius.
+	arva_seo_fs();
+	// Signal that SDK was initiated.
+	do_action( 'arva_seo_fs_loaded' );
+}
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-arva-seo-activator.php

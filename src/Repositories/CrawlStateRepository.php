@@ -90,4 +90,8 @@ class CrawlStateRepository {
 			)
 		);
 	}
+
+	public function clear_state(): void {
+		delete_option( self::OPTION_KEY );
+	}
 }

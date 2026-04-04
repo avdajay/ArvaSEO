@@ -4,22 +4,24 @@ namespace ArvaSeo\Services;
 
 use ArvaSeo\Contracts\SeoService;
 use ArvaSeo\Repositories\CrawlResultsRepository;
+use ArvaSeo\Repositories\SettingsRepository;
 use ArvaSeo\Repositories\CrawlStateRepository;
 
 class Crawl {
-	private const DEFAULT_CHUNK_SIZE = 20;
-
 	private SeoService $seo_service;
 	private CrawlResultsRepository $repository;
+	private SettingsRepository $settings_repository;
 	private CrawlStateRepository $state_repository;
 
 	public function __construct(
 		SeoService $seo_service,
 		CrawlResultsRepository $repository,
+		SettingsRepository $settings_repository,
 		CrawlStateRepository $state_repository
 	) {
 		$this->seo_service = $seo_service;
 		$this->repository = $repository;
+		$this->settings_repository = $settings_repository;
 		$this->state_repository = $state_repository;
 	}
 
@@ -28,7 +30,7 @@ class Crawl {
 	}
 
 	public function get_default_chunk_size(): int {
-		return self::DEFAULT_CHUNK_SIZE;
+		return $this->settings_repository->get_crawl_batch_size();
 	}
 
 	public function get_state(): array {
@@ -39,7 +41,7 @@ class Crawl {
 		$provider = $this->seo_service->get_provider_name();
 		$post_ids = $this->get_public_post_ids();
 		$total = count( $post_ids );
-		$limit = null === $limit ? self::DEFAULT_CHUNK_SIZE : max( 1, $limit );
+		$limit = null === $limit ? $this->get_default_chunk_size() : max( 1, $limit );
 		$state = $this->state_repository->get_state();
 
 		if ( $start || $provider !== $state['provider'] || ! in_array( $state['status'], [ 'running', 'paused' ], true ) ) {

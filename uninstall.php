@@ -29,3 +29,18 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+$settings = get_option( 'arva_seo_settings', [] );
+
+if ( empty( $settings['delete_data_on_uninstall'] ) ) {
+	return;
+}
+
+global $wpdb;
+
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}arva_seo_crawl_results" );
+
+delete_option( 'arva_seo_settings' );
+delete_option( 'arva_seo_no_seo_plugin_notice' );
+delete_option( 'arva_seo_crawl_schema_version' );
+delete_option( 'arva_seo_crawl_state' );

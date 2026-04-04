@@ -3,18 +3,18 @@
 namespace ArvaSeo\Actions;
 
 use ArvaSeo\Repositories\BulkEditRepository;
+use ArvaSeo\Repositories\SettingsRepository;
 use ArvaSeo\Services\SeoProviderResolver;
 
 class ProcessBulkEdit {
-
-	private const CHUNK_SIZE = 20;
-
 	private SeoProviderResolver $resolver;
 	private BulkEditRepository $repository;
+	private SettingsRepository $settings_repository;
 
-	public function __construct( SeoProviderResolver $resolver, BulkEditRepository $repository ) {
+	public function __construct( SeoProviderResolver $resolver, BulkEditRepository $repository, SettingsRepository $settings_repository ) {
 		$this->resolver = $resolver;
 		$this->repository = $repository;
+		$this->settings_repository = $settings_repository;
 	}
 
 	public function save_preview(): void {
@@ -66,7 +66,7 @@ class ProcessBulkEdit {
 		$rows = $this->repository->get_preview_rows( $user_id );
 		$state = $this->repository->get_state( $user_id );
 		$offset = (int) $state['processed'];
-		$batch = array_slice( $rows, $offset, self::CHUNK_SIZE );
+		$batch = array_slice( $rows, $offset, $this->settings_repository->get_bulk_edit_batch_size() );
 		$updated = 0;
 		$skipped = 0;
 		$errors = 0;

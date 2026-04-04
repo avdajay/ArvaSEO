@@ -6,6 +6,7 @@ use ArvaSeo\Helpers\View;
 use ArvaSeo\Repositories\BulkEditRepository;
 use ArvaSeo\Repositories\CrawlResultsRepository;
 use ArvaSeo\Repositories\CrawlStateRepository;
+use ArvaSeo\Repositories\SettingsRepository;
 use ArvaSeo\Services\SeoProviderResolver;
 
 /**
@@ -50,6 +51,7 @@ class SetupPages {
 	private BulkEditRepository $bulk_edit_repository;
 	private CrawlResultsRepository $crawl_results_repository;
 	private CrawlStateRepository $crawl_state_repository;
+	private SettingsRepository $settings_repository;
 	private SeoProviderResolver $provider_resolver;
 
 	/**
@@ -66,6 +68,7 @@ class SetupPages {
 		BulkEditRepository $bulk_edit_repository,
 		CrawlResultsRepository $crawl_results_repository,
 		CrawlStateRepository $crawl_state_repository,
+		SettingsRepository $settings_repository,
 		SeoProviderResolver $provider_resolver
 	) {
 
@@ -74,6 +77,7 @@ class SetupPages {
 		$this->bulk_edit_repository = $bulk_edit_repository;
 		$this->crawl_results_repository = $crawl_results_repository;
 		$this->crawl_state_repository = $crawl_state_repository;
+		$this->settings_repository = $settings_repository;
 		$this->provider_resolver = $provider_resolver;
 
 	}
@@ -162,7 +166,15 @@ class SetupPages {
 	}
 
 	public function arva_seo_settings_page(): null {
-		return View::render( 'admin.settings' );
+		return View::render(
+			'admin.settings',
+			[
+				'settings' => $this->settings_repository->get_settings(),
+				'min_batch_size' => $this->settings_repository->get_min_batch_size(),
+				'max_batch_size' => $this->settings_repository->get_max_batch_size(),
+				'settings_notice' => isset( $_GET['arva_seo_settings_notice'] ) ? sanitize_text_field( wp_unslash( $_GET['arva_seo_settings_notice'] ) ) : '',
+			]
+		);
 	}
 
 	public function arva_seo_crawl_page(): null {

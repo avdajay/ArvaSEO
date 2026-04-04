@@ -13,5 +13,7 @@
             "email": "avdajay@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "freemius/wordpress-sdk": "^2.13"
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace ArvaSeo\Admin;
 
+use ArvaSeo\Repositories\SettingsRepository;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -41,6 +43,7 @@ class AdminEnqueue {
 	 * @var      string $version The current version of this plugin.
 	 */
 	private string $version;
+	private SettingsRepository $settings_repository;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -50,11 +53,12 @@ class AdminEnqueue {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct( string $plugin_name, string $version )
+	public function __construct( string $plugin_name, string $version, SettingsRepository $settings_repository )
 	{
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->settings_repository = $settings_repository;
 
 	}
 
@@ -70,6 +74,7 @@ class AdminEnqueue {
 
     public function enqueue_scripts(): void
     {
+		$settings = $this->settings_repository->get_settings();
         wp_enqueue_script( $this->plugin_name, ARVA_SEO_URL . 'assets/js/arva-seo.js', array(), $this->version, true );
 		wp_localize_script(
 			$this->plugin_name,
@@ -78,7 +83,7 @@ class AdminEnqueue {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'crawlNonce' => wp_create_nonce( 'arva_seo_start_crawl' ),
 				'crawlAction' => 'arva_seo_start_crawl',
-				'crawlChunkSize' => 20,
+				'crawlChunkSize' => (int) $settings['crawl_batch_size'],
 				'bulkEditNonce' => wp_create_nonce( 'arva_seo_bulk_edit_process' ),
 				'bulkEditPrepareAction' => 'arva_seo_bulk_edit_prepare',
 				'bulkEditProcessAction' => 'arva_seo_bulk_edit_process',
