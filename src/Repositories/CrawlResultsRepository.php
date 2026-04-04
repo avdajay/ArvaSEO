@@ -9,12 +9,18 @@ class CrawlResultsRepository {
 	private const SCHEMA_VERSION = '1.3.0';
 
 	private function get_supported_post_types(): array {
+		$can_include_product = false;
+
+		if ( function_exists( 'arva_seo_fs' ) && arva_seo_fs()->is__premium_only() ) {
+			$can_include_product = arva_seo_fs()->can_use_premium_code__premium_only();
+		}
+
 		return array_values(
 			array_filter(
 				[
 					post_type_exists( 'post' ) ? 'post' : null,
 					post_type_exists( 'page' ) ? 'page' : null,
-					post_type_exists( 'product' ) ? 'product' : null,
+					post_type_exists( 'product' ) && $can_include_product ? 'product' : null,
 				]
 			)
 		);

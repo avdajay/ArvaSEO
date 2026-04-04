@@ -7,11 +7,19 @@
 				<?php
 				if ( $has_active_provider ) {
 					echo esc_html( sprintf( 'Detected SEO provider: %s', $active_provider ) );
+				} elseif ( $provider_requires_premium ) {
+					echo esc_html( $provider_upgrade_message );
 				} else {
 					echo esc_html__( 'No supported SEO plugin is active. Activate Yoast SEO, All in One SEO, Rank Math, or SEOPress to use bulk edit.', 'arva-seo' );
 				}
 				?>
             </p>
+			<?php if ( $provider_requires_premium ) : ?>
+                <div class="arva-seo-inline-upsell arva-seo-rounded">
+                    <p><?php esc_html_e( 'Upgrade to Premium to edit SEO data when the site is powered by Rank Math, All in One SEO, or SEOPress.', 'arva-seo' ); ?></p>
+                    <a class="arva-seo-btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Upgrade To Premium', 'arva-seo' ); ?></a>
+                </div>
+			<?php endif; ?>
             <form class="arva-seo-bulk-upload-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="arva_seo_upload_bulk_edit">
 				<?php wp_nonce_field( 'arva_seo_upload_bulk_edit', 'arva_seo_upload_nonce' ); ?>
@@ -28,6 +36,7 @@
 						'missing-file' => __( 'Choose a CSV file before uploading.', 'arva-seo' ),
 						'invalid-file' => __( 'The uploaded file could not be read.', 'arva-seo' ),
 						'no-provider' => __( 'No supported SEO plugin is active.', 'arva-seo' ),
+						'provider-premium' => __( 'The free version supports Yoast SEO only. Upgrade to use Rank Math, All in One SEO, or SEOPress.', 'arva-seo' ),
 					];
 					echo esc_html( $messages[ $bulk_edit_notice ] ?? $bulk_edit_notice );
 					?>

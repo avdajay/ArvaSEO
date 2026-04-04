@@ -12,17 +12,20 @@ class Crawl {
 	private CrawlResultsRepository $repository;
 	private SettingsRepository $settings_repository;
 	private CrawlStateRepository $state_repository;
+	private Licensing $licensing;
 
 	public function __construct(
 		SeoService $seo_service,
 		CrawlResultsRepository $repository,
 		SettingsRepository $settings_repository,
-		CrawlStateRepository $state_repository
+		CrawlStateRepository $state_repository,
+		Licensing $licensing
 	) {
 		$this->seo_service = $seo_service;
 		$this->repository = $repository;
 		$this->settings_repository = $settings_repository;
 		$this->state_repository = $state_repository;
+		$this->licensing = $licensing;
 	}
 
 	public function is_available(): bool {
@@ -151,7 +154,7 @@ class Crawl {
 				[
 					post_type_exists( 'post' ) ? 'post' : null,
 					post_type_exists( 'page' ) ? 'page' : null,
-					post_type_exists( 'product' ) ? 'product' : null,
+					post_type_exists( 'product' ) && $this->licensing->can_crawl_post_type( 'product' ) ? 'product' : null,
 				]
 			)
 		);

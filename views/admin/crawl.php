@@ -1,5 +1,22 @@
 <div class="arva-seo-wrapper">
     <h1 class="arva-seo-text-dark">Crawl</h1>
+	<?php if ( ! $can_access_crawl_page ) : ?>
+        <div class="arva-seo-premium-lock arva-seo-bg-lighter arva-seo-rounded">
+            <div class="arva-seo-premium-lock-badge"><?php esc_html_e( 'Premium Feature', 'arva-seo' ); ?></div>
+            <h2 class="arva-seo-text-dark"><?php esc_html_e( 'Unlock The Crawl Workspace', 'arva-seo' ); ?></h2>
+            <p><?php echo esc_html( $crawl_upgrade_message ); ?></p>
+            <p><?php echo esc_html( $woocommerce_upgrade_message ); ?></p>
+			<?php if ( $provider_requires_premium ) : ?>
+                <p><?php echo esc_html( $provider_upgrade_message ); ?></p>
+			<?php else : ?>
+                <p><?php esc_html_e( 'Premium also unlocks WooCommerce product crawling, exports, and recrawl workflows for fresh SEO snapshots.', 'arva-seo' ); ?></p>
+			<?php endif; ?>
+            <div class="arva-seo-premium-lock-actions">
+                <a class="arva-seo-btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Upgrade To Premium', 'arva-seo' ); ?></a>
+            </div>
+        </div>
+		<?php return; ?>
+	<?php endif; ?>
     <div class="arva-seo-container arva-seo-bg-lighter arva-seo-rounded arva-seo-crawl-toolbar">
         <div class="arva-seo-crawl-toolbar-copy">
             <div class="arva-seo-crawl-toolbar-copy-inner">
@@ -7,6 +24,8 @@
                     <?php
                     if ( $has_active_provider ) {
                         echo esc_html( sprintf( 'Detected SEO provider: %s', $active_provider ) );
+                    } elseif ( $provider_requires_premium ) {
+                        echo esc_html( $provider_upgrade_message );
                     } else {
                         echo esc_html__( 'No supported SEO plugin is active. Activate Yoast SEO, All in One SEO, Rank Math, or SEOPress to crawl.', 'arva-seo' );
                     }

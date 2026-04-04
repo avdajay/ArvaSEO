@@ -592,6 +592,45 @@ body.arva-seo_page_arva-seo-settings #wpbody h3 {
     padding: 24px;
 }
 
+.arva-seo-premium-lock,
+.arva-seo-inline-upsell {
+    border: 1px solid #cfe5d5;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.arva-seo-premium-lock {
+    max-width: 820px;
+}
+
+.arva-seo-premium-lock-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(33, 120, 55, 0.1);
+    color: var(--arva-seo-primary-color-active);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.arva-seo-premium-lock p,
+.arva-seo-inline-upsell p {
+    margin: 0;
+    color: #49614f;
+}
+
+.arva-seo-premium-lock-actions,
+.arva-seo-inline-upsell {
+    align-items: flex-start;
+}
+
 .arva-seo-opportunities-hero {
     display: flex;
     justify-content: space-between;

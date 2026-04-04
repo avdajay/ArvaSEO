@@ -4,17 +4,20 @@ namespace ArvaSeo\Actions;
 
 use ArvaSeo\Repositories\BulkEditRepository;
 use ArvaSeo\Repositories\SettingsRepository;
+use ArvaSeo\Services\Licensing;
 use ArvaSeo\Services\SeoProviderResolver;
 
 class ProcessBulkEdit {
 	private SeoProviderResolver $resolver;
 	private BulkEditRepository $repository;
 	private SettingsRepository $settings_repository;
+	private Licensing $licensing;
 
-	public function __construct( SeoProviderResolver $resolver, BulkEditRepository $repository, SettingsRepository $settings_repository ) {
+	public function __construct( SeoProviderResolver $resolver, BulkEditRepository $repository, SettingsRepository $settings_repository, Licensing $licensing ) {
 		$this->resolver = $resolver;
 		$this->repository = $repository;
 		$this->settings_repository = $settings_repository;
+		$this->licensing = $licensing;
 	}
 
 	public function save_preview(): void {
@@ -24,10 +27,14 @@ class ProcessBulkEdit {
 
 		check_ajax_referer( 'arva_seo_bulk_edit_process', 'nonce' );
 
+		if ( $this->resolver->detected_provider_requires_premium() ) {
+			wp_send_json_error( [ 'message' => __( 'This SEO provider requires ArvaSEO Premium.', 'arva-seo' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
+		}
+
 		$provider = $this->resolver->resolve();
 
 		if ( ! $provider->is_active() ) {
-			wp_send_json_error( [ 'message' => __( 'No supported SEO plugin is active.', 'arva-seo' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'No supported SEO plugin is active.', 'arva-seo' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
 		}
 
 		$rows = isset( $_POST['rows'] ) ? json_decode( wp_unslash( $_POST['rows'] ), true ) : null;
@@ -56,10 +63,14 @@ class ProcessBulkEdit {
 
 		check_ajax_referer( 'arva_seo_bulk_edit_process', 'nonce' );
 
+		if ( $this->resolver->detected_provider_requires_premium() ) {
+			wp_send_json_error( [ 'message' => __( 'This SEO provider requires ArvaSEO Premium.', 'arva-seo' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
+		}
+
 		$provider = $this->resolver->resolve();
 
 		if ( ! $provider->is_active() ) {
-			wp_send_json_error( [ 'message' => __( 'No supported SEO plugin is active.', 'arva-seo' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'No supported SEO plugin is active.', 'arva-seo' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
 		}
 
 		$user_id = get_current_user_id();

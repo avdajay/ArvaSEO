@@ -7,6 +7,13 @@
         <a class="arva-seo-btn-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=arva-seo-crawl' ) ); ?>"><?php esc_html_e( 'Go To Crawl', 'arva-seo' ); ?></a>
     </div>
 
+	<?php if ( $provider_requires_premium ) : ?>
+        <div class="arva-seo-inline-upsell arva-seo-rounded">
+            <p><?php echo esc_html( $provider_upgrade_message ); ?></p>
+            <a class="arva-seo-btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Upgrade To Premium', 'arva-seo' ); ?></a>
+        </div>
+	<?php endif; ?>
+
     <div class="arva-seo-opportunities-grid">
         <div class="arva-seo-op-card arva-seo-bg-lighter arva-seo-rounded">
             <span class="arva-seo-summary-label"><?php esc_html_e( 'Overall SEO Score', 'arva-seo' ); ?></span>

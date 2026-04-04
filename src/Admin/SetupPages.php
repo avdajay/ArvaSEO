@@ -7,6 +7,7 @@ use ArvaSeo\Repositories\BulkEditRepository;
 use ArvaSeo\Repositories\CrawlResultsRepository;
 use ArvaSeo\Repositories\CrawlStateRepository;
 use ArvaSeo\Repositories\SettingsRepository;
+use ArvaSeo\Services\Licensing;
 use ArvaSeo\Services\SeoProviderResolver;
 
 /**
@@ -53,6 +54,7 @@ class SetupPages {
 	private CrawlStateRepository $crawl_state_repository;
 	private SettingsRepository $settings_repository;
 	private SeoProviderResolver $provider_resolver;
+	private Licensing $licensing;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -69,7 +71,8 @@ class SetupPages {
 		CrawlResultsRepository $crawl_results_repository,
 		CrawlStateRepository $crawl_state_repository,
 		SettingsRepository $settings_repository,
-		SeoProviderResolver $provider_resolver
+		SeoProviderResolver $provider_resolver,
+		Licensing $licensing
 	) {
 
 		$this->plugin_name = $plugin_name;
@@ -79,6 +82,7 @@ class SetupPages {
 		$this->crawl_state_repository = $crawl_state_repository;
 		$this->settings_repository = $settings_repository;
 		$this->provider_resolver = $provider_resolver;
+		$this->licensing = $licensing;
 
 	}
 
@@ -148,6 +152,10 @@ class SetupPages {
 			'admin.opportunities',
 			[
 				'dashboard' => $dashboard,
+				'detected_provider' => $this->provider_resolver->get_detected_provider_name(),
+				'provider_requires_premium' => $this->provider_resolver->detected_provider_requires_premium(),
+				'provider_upgrade_message' => $this->licensing->get_provider_upgrade_message( $this->provider_resolver->get_detected_provider_name() ),
+				'upgrade_url' => $this->licensing->get_upgrade_url(),
 				'selected_opportunity' => $selected_opportunity,
 				'opportunity_items' => '' !== $selected_opportunity
 					? $this->crawl_results_repository->get_opportunity_items( $selected_opportunity, $current_page, $per_page )
@@ -176,8 +184,11 @@ class SetupPages {
 		return View::render(
 			'admin.bulk-edit',
 			[
-				'active_provider' => $this->provider_resolver->get_active_provider_name(),
+				'active_provider' => $this->provider_resolver->get_detected_provider_name(),
 				'has_active_provider' => $this->provider_resolver->has_active_provider(),
+				'provider_requires_premium' => $this->provider_resolver->detected_provider_requires_premium(),
+				'provider_upgrade_message' => $this->licensing->get_provider_upgrade_message( $this->provider_resolver->get_detected_provider_name() ),
+				'upgrade_url' => $this->licensing->get_upgrade_url(),
 				'preview_rows' => $this->bulk_edit_repository->get_preview_rows( $user_id ),
 				'bulk_edit_state' => $bulk_edit_state,
 				'bulk_edit_notice' => $bulk_edit_notice,
@@ -210,8 +221,14 @@ class SetupPages {
 		return View::render(
 			'admin.crawl',
 			[
-				'active_provider' => $this->provider_resolver->get_active_provider_name(),
+				'active_provider' => $this->provider_resolver->get_detected_provider_name(),
 				'has_active_provider' => $this->provider_resolver->has_active_provider(),
+				'provider_requires_premium' => $this->provider_resolver->detected_provider_requires_premium(),
+				'provider_upgrade_message' => $this->licensing->get_provider_upgrade_message( $this->provider_resolver->get_detected_provider_name() ),
+				'can_access_crawl_page' => $this->licensing->can_access_crawl_page(),
+				'crawl_upgrade_message' => $this->licensing->get_crawl_upgrade_message(),
+				'woocommerce_upgrade_message' => $this->licensing->get_woocommerce_upgrade_message(),
+				'upgrade_url' => $this->licensing->get_upgrade_url(),
 				'results' => $this->crawl_results_repository->get_paginated_results( $current_page, $per_page, $search_query ),
 				'current_page' => $current_page,
 				'total_pages' => $total_pages,

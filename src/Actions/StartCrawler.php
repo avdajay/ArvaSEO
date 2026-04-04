@@ -3,13 +3,16 @@
 namespace ArvaSeo\Actions;
 
 use ArvaSeo\Services\Crawl;
+use ArvaSeo\Services\Licensing;
 
 class StartCrawler {
 
 	private Crawl $crawl;
+	private Licensing $licensing;
 
-	public function __construct( Crawl $crawl ) {
+	public function __construct( Crawl $crawl, Licensing $licensing ) {
 		$this->crawl = $crawl;
+		$this->licensing = $licensing;
 	}
 
 	public function handle(): void {
@@ -24,6 +27,21 @@ class StartCrawler {
 
 		check_ajax_referer( 'arva_seo_start_crawl', 'nonce' );
 
+		if ( function_exists( 'arva_seo_fs' ) && arva_seo_fs()->is__premium_only() ) {
+			$this->handle_premium__premium_only();
+			return;
+		}
+
+		wp_send_json_error(
+			[
+				'message' => $this->licensing->get_crawl_upgrade_message(),
+				'upgrade_url' => $this->licensing->get_upgrade_url(),
+			],
+			403
+		);
+	}
+
+	private function handle_premium__premium_only(): void {
 		if ( function_exists( 'ignore_user_abort' ) ) {
 			ignore_user_abort( true );
 		}
@@ -33,9 +51,16 @@ class StartCrawler {
 		}
 
 		if ( ! $this->crawl->is_available() ) {
+			$message = __( 'No supported SEO plugin is active.', 'arva-seo' );
+
+			if ( $this->licensing->is_free_user() ) {
+				$message = __( 'The free version supports Yoast SEO only. Upgrade to use Rank Math, All in One SEO, or SEOPress.', 'arva-seo' );
+			}
+
 			wp_send_json_error(
 				[
-					'message' => __( 'No supported SEO plugin is active.', 'arva-seo' ),
+					'message' => $message,
+					'upgrade_url' => $this->licensing->get_upgrade_url(),
 				],
 				400
 			);

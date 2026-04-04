@@ -3,16 +3,19 @@
 namespace ArvaSeo\Actions;
 
 use ArvaSeo\Repositories\BulkEditRepository;
+use ArvaSeo\Services\Licensing;
 use ArvaSeo\Services\SeoProviderResolver;
 
 class UploadBulkEdit {
 
 	private SeoProviderResolver $resolver;
 	private BulkEditRepository $repository;
+	private Licensing $licensing;
 
-	public function __construct( SeoProviderResolver $resolver, BulkEditRepository $repository ) {
+	public function __construct( SeoProviderResolver $resolver, BulkEditRepository $repository, Licensing $licensing ) {
 		$this->resolver = $resolver;
 		$this->repository = $repository;
+		$this->licensing = $licensing;
 	}
 
 	public function handle(): void {
@@ -21,6 +24,10 @@ class UploadBulkEdit {
 		}
 
 		check_admin_referer( 'arva_seo_upload_bulk_edit', 'arva_seo_upload_nonce' );
+
+		if ( $this->resolver->detected_provider_requires_premium() ) {
+			$this->redirect_with_notice( 'provider-premium' );
+		}
 
 		$provider = $this->resolver->resolve();
 

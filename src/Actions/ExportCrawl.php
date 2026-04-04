@@ -3,13 +3,16 @@
 namespace ArvaSeo\Actions;
 
 use ArvaSeo\Repositories\CrawlResultsRepository;
+use ArvaSeo\Services\Licensing;
 
 class ExportCrawl {
 
 	private CrawlResultsRepository $repository;
+	private Licensing $licensing;
 
-	public function __construct( CrawlResultsRepository $repository ) {
+	public function __construct( CrawlResultsRepository $repository, Licensing $licensing ) {
 		$this->repository = $repository;
+		$this->licensing = $licensing;
 	}
 
 	public function handle(): void {
@@ -19,6 +22,15 @@ class ExportCrawl {
 
 		check_admin_referer( 'arva_seo_export_crawl', 'arva_seo_export_nonce' );
 
+		if ( function_exists( 'arva_seo_fs' ) && arva_seo_fs()->is__premium_only() ) {
+			$this->export__premium_only();
+			return;
+		}
+
+		wp_die( esc_html( $this->licensing->get_crawl_upgrade_message() ) );
+	}
+
+	private function export__premium_only(): void {
 		$search_query = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 		$rows = $this->repository->get_results_for_export( $search_query );
 		$filename = 'arva-seo-crawl-export-' . gmdate( 'Y-m-d-H-i-s' ) . '.csv';

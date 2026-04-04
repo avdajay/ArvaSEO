@@ -16,6 +16,7 @@ use ArvaSeo\Repositories\CrawlResultsRepository;
 use ArvaSeo\Repositories\CrawlStateRepository;
 use ArvaSeo\Repositories\SettingsRepository;
 use ArvaSeo\Services\Crawl;
+use ArvaSeo\Services\Licensing;
 use ArvaSeo\Services\SeoProviderResolver;
 
 /**
@@ -149,8 +150,9 @@ class Bootstrap {
 		$crawl_results_repository->ensure_schema();
 		$crawl_state_repository = new CrawlStateRepository();
 		$settings_repository = new SettingsRepository();
-		$provider_resolver = new SeoProviderResolver();
-		$crawl = new Crawl( $provider_resolver->resolve(), $crawl_results_repository, $settings_repository, $crawl_state_repository );
+		$licensing = new Licensing();
+		$provider_resolver = new SeoProviderResolver( null, $licensing );
+		$crawl = new Crawl( $provider_resolver->resolve(), $crawl_results_repository, $settings_repository, $crawl_state_repository, $licensing );
 		$admin_enqueue = new AdminEnqueue( $this->get_plugin_name(), $this->get_version(), $settings_repository );
 		$setup_pages = new SetupPages(
 			$this->get_plugin_name(),
@@ -159,13 +161,14 @@ class Bootstrap {
 			$crawl_results_repository,
 			$crawl_state_repository,
 			$settings_repository,
-			$provider_resolver
+			$provider_resolver,
+			$licensing
 		);
 		$notices = new Notices();
-		$start_crawler = new StartCrawler( $crawl );
-		$export_crawl = new ExportCrawl( $crawl_results_repository );
-		$upload_bulk_edit = new UploadBulkEdit( $provider_resolver, $bulk_edit_repository );
-		$process_bulk_edit = new ProcessBulkEdit( $provider_resolver, $bulk_edit_repository, $settings_repository );
+		$start_crawler = new StartCrawler( $crawl, $licensing );
+		$export_crawl = new ExportCrawl( $crawl_results_repository, $licensing );
+		$upload_bulk_edit = new UploadBulkEdit( $provider_resolver, $bulk_edit_repository, $licensing );
+		$process_bulk_edit = new ProcessBulkEdit( $provider_resolver, $bulk_edit_repository, $settings_repository, $licensing );
 		$save_settings = new SaveSettings( $settings_repository );
 		$reset_crawl_data = new ResetCrawlData( $crawl_results_repository, $crawl_state_repository );
 
