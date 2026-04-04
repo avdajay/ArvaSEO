@@ -1,8 +1,17 @@
 @font-face {
-    font-family: 'Inter';
-    src: url('../fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    font-family: 'ArvaSEO Sans';
+    src: url('../fonts/Inter-VariableFont.ttf') format('truetype');
     font-weight: 100 900;
     font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ArvaSEO Sans';
+    src: url('../fonts/Inter-Italic-VariableFont.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
 }
 
 :root {
@@ -86,7 +95,7 @@ body.arva-seo_page_arva-seo-settings #wpbody h3 {
 }
 
 .arva-seo-wrapper {
-    font-family: 'Inter', sans-serif !important;
+    font-family: 'ArvaSEO Sans', sans-serif !important;
     padding: 20px;
     display: flex;
     flex-direction: column;
