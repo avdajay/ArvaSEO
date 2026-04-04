@@ -1,4 +1,4 @@
-<div class="arva-seo-wrapper">
+<div class="arva-seo-wrapper" <?php echo ! empty( $is_preview_load ) ? 'data-clear-preview-url="1"' : ''; ?>>
     <h1 class="arva-seo-text-dark">Bulk Edit</h1>
     <div class="arva-seo-container arva-seo-bg-lighter arva-seo-rounded arva-seo-bulk-toolbar">
         <div class="arva-seo-bulk-toolbar-copy">
@@ -25,8 +25,9 @@
 				<?php wp_nonce_field( 'arva_seo_upload_bulk_edit', 'arva_seo_upload_nonce' ); ?>
                 <input type="file" name="bulk_edit_file" accept=".csv" <?php disabled( ! $has_active_provider ); ?>>
                 <button class="arva-seo-btn-primary" type="submit" <?php disabled( ! $has_active_provider ); ?>><?php esc_html_e( 'Upload CSV', 'arva-seo' ); ?></button>
+                <a class="arva-seo-btn-primary" href="<?php echo esc_url( $template_url ); ?>"><?php esc_html_e( 'Download Template', 'arva-seo' ); ?></a>
             </form>
-            <p class="arva-seo-summary-meta"><?php esc_html_e( 'Blank values in the CSV are treated as "skip" and will not overwrite existing data.', 'arva-seo' ); ?></p>
+            <p class="arva-seo-summary-meta"><?php esc_html_e( 'Blank values in the CSV are treated as "skip" and will not overwrite existing data. Use the template to match the required import headers.', 'arva-seo' ); ?></p>
 			<?php if ( '' !== $bulk_edit_notice ) : ?>
                 <p class="arva-seo-bulk-notice">
 					<?php

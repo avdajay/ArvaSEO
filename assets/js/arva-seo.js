@@ -162,6 +162,7 @@
 	} );
 
 	document.addEventListener( 'DOMContentLoaded', function() {
+		var bulkWrapper = document.querySelector( '.arva-seo-wrapper[data-clear-preview-url="1"]' );
 		var bulkForm = document.getElementById( 'arva-seo-bulk-edit-form' );
 		var bulkButton = document.getElementById( 'arva-seo-start-bulk-edit' );
 		var bulkState = document.getElementById( 'arva-seo-bulk-edit-state' );
@@ -169,6 +170,17 @@
 		var bulkPercent = document.getElementById( 'arva-seo-bulk-edit-progress-percent' );
 		var bulkCopy = document.getElementById( 'arva-seo-bulk-edit-progress-copy' );
 		var isRunning = false;
+
+		if ( bulkWrapper && window.history && window.history.replaceState ) {
+			var url = new URL( window.location.href );
+			url.searchParams.delete( 'arva_seo_preview' );
+
+			if ( 'preview-ready' === url.searchParams.get( 'arva_seo_bulk_notice' ) ) {
+				url.searchParams.delete( 'arva_seo_bulk_notice' );
+			}
+
+			window.history.replaceState( {}, document.title, url.toString() );
+		}
 
 		if ( ! bulkForm || ! bulkButton || ! bulkState || ! bulkProgress || ! bulkPercent || ! bulkCopy || 'undefined' === typeof arvaSeoAdmin ) {
 			return;

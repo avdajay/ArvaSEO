@@ -5,6 +5,7 @@ namespace ArvaSeo\Core;
 use ArvaSeo\Admin\AdminEnqueue;
 use ArvaSeo\Admin\Notices;
 use ArvaSeo\Admin\SetupPages;
+use ArvaSeo\Actions\DownloadBulkEditTemplate;
 use ArvaSeo\Actions\ExportCrawl;
 use ArvaSeo\Actions\ProcessBulkEdit;
 use ArvaSeo\Actions\ResetCrawlData;
@@ -167,6 +168,7 @@ class Bootstrap {
 		$notices = new Notices();
 		$start_crawler = new StartCrawler( $crawl, $licensing );
 		$export_crawl = new ExportCrawl( $crawl_results_repository, $licensing );
+		$download_bulk_edit_template = new DownloadBulkEditTemplate();
 		$upload_bulk_edit = new UploadBulkEdit( $provider_resolver, $bulk_edit_repository, $licensing );
 		$process_bulk_edit = new ProcessBulkEdit( $provider_resolver, $bulk_edit_repository, $settings_repository, $licensing );
 		$save_settings = new SaveSettings( $settings_repository );
@@ -179,6 +181,7 @@ class Bootstrap {
 		$this->loader->add_action( 'admin_notices', $notices, 'crawl_complete_notice' );
 		$this->loader->add_action( 'wp_ajax_arva_seo_start_crawl', $start_crawler, 'handle' );
 		$this->loader->add_action( 'admin_post_arva_seo_export_crawl', $export_crawl, 'handle' );
+		$this->loader->add_action( 'admin_post_arva_seo_download_bulk_edit_template', $download_bulk_edit_template, 'handle' );
 		$this->loader->add_action( 'admin_post_arva_seo_upload_bulk_edit', $upload_bulk_edit, 'handle' );
 		$this->loader->add_action( 'admin_post_arva_seo_save_settings', $save_settings, 'handle' );
 		$this->loader->add_action( 'admin_post_arva_seo_reset_crawl_data', $reset_crawl_data, 'handle' );

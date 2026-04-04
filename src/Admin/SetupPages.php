@@ -171,6 +171,7 @@ class SetupPages {
 		$user_id = get_current_user_id();
 		$bulk_edit_state = $this->bulk_edit_repository->get_state( $user_id );
 		$bulk_edit_notice = isset( $_GET['arva_seo_bulk_notice'] ) ? sanitize_text_field( wp_unslash( $_GET['arva_seo_bulk_notice'] ) ) : '';
+		$is_preview_load = isset( $_GET['arva_seo_preview'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['arva_seo_preview'] ) );
 		$completion_message = '';
 
 		if ( 'completed' === $bulk_edit_state['status'] ) {
@@ -179,7 +180,14 @@ class SetupPages {
 			$this->bulk_edit_repository->clear_state( $user_id );
 			$bulk_edit_state = $this->bulk_edit_repository->get_state( $user_id );
 			$bulk_edit_notice = '' !== $completion_message ? $completion_message : $bulk_edit_notice;
+		} elseif ( [] !== $this->bulk_edit_repository->get_preview_rows( $user_id ) && ! $is_preview_load ) {
+			$this->bulk_edit_repository->clear_preview_rows( $user_id );
+			$this->bulk_edit_repository->clear_state( $user_id );
+			$bulk_edit_state = $this->bulk_edit_repository->get_state( $user_id );
+			$bulk_edit_notice = '';
 		}
+
+		$preview_rows = $this->bulk_edit_repository->get_preview_rows( $user_id );
 
 		return View::render(
 			'admin.bulk-edit',
@@ -189,9 +197,20 @@ class SetupPages {
 				'provider_requires_premium' => $this->provider_resolver->detected_provider_requires_premium(),
 				'provider_upgrade_message' => $this->licensing->get_provider_upgrade_message( $this->provider_resolver->get_detected_provider_name() ),
 				'upgrade_url' => $this->licensing->get_upgrade_url(),
-				'preview_rows' => $this->bulk_edit_repository->get_preview_rows( $user_id ),
+				'template_url' => wp_nonce_url(
+					add_query_arg(
+						[
+							'action' => 'arva_seo_download_bulk_edit_template',
+						],
+						admin_url( 'admin-post.php' )
+					),
+					'arva_seo_download_bulk_edit_template',
+					'arva_seo_template_nonce'
+				),
+				'preview_rows' => $preview_rows,
 				'bulk_edit_state' => $bulk_edit_state,
 				'bulk_edit_notice' => $bulk_edit_notice,
+				'is_preview_load' => $is_preview_load,
 			]
 		);
 	}

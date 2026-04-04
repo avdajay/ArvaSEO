@@ -176,12 +176,18 @@ class UploadBulkEdit {
 	}
 
 	private function redirect_with_notice( string $notice ): void {
+		$args = [
+			'page' => 'arva-seo-bulk-edit',
+			'arva_seo_bulk_notice' => $notice,
+		];
+
+		if ( 'preview-ready' === $notice ) {
+			$args['arva_seo_preview'] = '1';
+		}
+
 		wp_safe_redirect(
 			add_query_arg(
-				[
-					'page' => 'arva-seo-bulk-edit',
-					'arva_seo_bulk_notice' => $notice,
-				],
+				$args,
 				admin_url( 'admin.php' )
 			)
 		);
