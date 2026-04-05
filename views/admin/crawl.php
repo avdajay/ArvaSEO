@@ -1,5 +1,5 @@
 <div class="arva-seo-wrapper">
-    <h1 class="arva-seo-text-dark">Crawl</h1>
+    <h1 class="arva-seo-text-dark"><?php esc_html_e( 'Crawl', 'arva-seo' ); ?></h1>
 	<?php if ( ! $can_access_crawl_page ) : ?>
         <div class="arva-seo-premium-lock arva-seo-bg-lighter arva-seo-rounded">
             <div class="arva-seo-premium-lock-badge"><?php esc_html_e( 'Premium Feature', 'arva-seo' ); ?></div>

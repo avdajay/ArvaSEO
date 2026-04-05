@@ -93,8 +93,8 @@ class SetupPages {
 	 */
 	public function add_admin_menu(): void {
 		add_menu_page(
-			'Arva SEO',
-			'Arva SEO',
+			__( 'Arva SEO', 'arva-seo' ),
+			__( 'Arva SEO', 'arva-seo' ),
 			'manage_options',
 			'arva-seo',
 			array( $this, 'arva_seo_page' ),
@@ -104,8 +104,8 @@ class SetupPages {
 
 		add_submenu_page(
 			'arva-seo',
-			'Opportunities',
-			'Opportunities',
+			__( 'Opportunities', 'arva-seo' ),
+			__( 'Opportunities', 'arva-seo' ),
 			'manage_options',
 			'arva-seo',
 			array( $this, 'arva_seo_page' )
@@ -113,8 +113,8 @@ class SetupPages {
 
 		add_submenu_page(
 			'arva-seo',
-			'Crawl',
-			'Crawl',
+			__( 'Crawl', 'arva-seo' ),
+			__( 'Crawl', 'arva-seo' ),
 			'manage_options',
 			'arva-seo-crawl',
 			array( $this, 'arva_seo_crawl_page' )
@@ -122,8 +122,8 @@ class SetupPages {
 
 		add_submenu_page(
 			'arva-seo',
-			'Bulk Edit',
-			'Bulk Edit',
+			__( 'Bulk Edit', 'arva-seo' ),
+			__( 'Bulk Edit', 'arva-seo' ),
 			'manage_options',
 			'arva-seo-bulk-edit',
 			array( $this, 'arva_seo_bulk_edit_page' )
@@ -131,8 +131,8 @@ class SetupPages {
 
 		add_submenu_page(
 			'arva-seo',
-			'Settings',
-			'Settings',
+			__( 'Settings', 'arva-seo' ),
+			__( 'Settings', 'arva-seo' ),
 			'manage_options',
 			'arva-seo-settings',
 			array( $this, 'arva_seo_settings_page' )

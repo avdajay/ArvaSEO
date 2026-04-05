@@ -1,5 +1,5 @@
 <div class="arva-seo-wrapper" <?php echo ! empty( $is_preview_load ) ? 'data-clear-preview-url="1"' : ''; ?>>
-    <h1 class="arva-seo-text-dark">Bulk Edit</h1>
+    <h1 class="arva-seo-text-dark"><?php esc_html_e( 'Bulk Edit', 'arva-seo' ); ?></h1>
     <div class="arva-seo-container arva-seo-bg-lighter arva-seo-rounded arva-seo-bulk-toolbar">
         <div class="arva-seo-bulk-toolbar-copy">
             <h3><?php esc_html_e( 'Upload Crawl Export', 'arva-seo' ); ?></h3>

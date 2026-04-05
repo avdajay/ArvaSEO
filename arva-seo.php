@@ -13,10 +13,12 @@
  * @package           Arva_Seo
  *
  * @wordpress-plugin
- * Plugin Name:       ArvaSEO
+ * Plugin Name:       Arva SEO
  * Plugin URI:        https://dajaydigital.com/
  * Description:       Your Ultimate SEO Assistant. Created for SEO Specialist who do site audits and assist them with the process making SEO fixes more fun and easy!
  * Version:           1.0.0
+ * Requires at least: 6.6
+ * Requires PHP:      8.2
  * Author:            Dajay Digital
  * Author URI:        https://dajaydigital.com/
  * License:           GPL-2.0+
