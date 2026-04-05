@@ -139,7 +139,7 @@ class SetupPages {
 		);
 	}
 
-	public function arva_seo_page(): null {
+	public function arva_seo_page(): void {
 		$dashboard = $this->crawl_results_repository->get_opportunities_dashboard();
 		$selected_opportunity = isset( $_GET['opportunity'] ) ? sanitize_text_field( wp_unslash( $_GET['opportunity'] ) ) : '';
 		$current_page = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
@@ -148,7 +148,7 @@ class SetupPages {
 		$detail_total_pages = max( 1, (int) ceil( $detail_total / $per_page ) );
 		$current_page = min( $current_page, $detail_total_pages );
 
-		return View::render(
+		View::render(
 			'admin.opportunities',
 			[
 				'dashboard' => $dashboard,
@@ -167,7 +167,7 @@ class SetupPages {
 		);
 	}
 
-	public function arva_seo_bulk_edit_page(): null {
+	public function arva_seo_bulk_edit_page(): void {
 		$user_id = get_current_user_id();
 		$bulk_edit_state = $this->bulk_edit_repository->get_state( $user_id );
 		$bulk_edit_notice = isset( $_GET['arva_seo_bulk_notice'] ) ? sanitize_text_field( wp_unslash( $_GET['arva_seo_bulk_notice'] ) ) : '';
@@ -189,7 +189,7 @@ class SetupPages {
 
 		$preview_rows = $this->bulk_edit_repository->get_preview_rows( $user_id );
 
-		return View::render(
+		View::render(
 			'admin.bulk-edit',
 			[
 				'active_provider' => $this->provider_resolver->get_detected_provider_name(),
@@ -215,8 +215,8 @@ class SetupPages {
 		);
 	}
 
-	public function arva_seo_settings_page(): null {
-		return View::render(
+	public function arva_seo_settings_page(): void {
+		View::render(
 			'admin.settings',
 			[
 				'settings' => $this->settings_repository->get_settings(),
@@ -227,7 +227,7 @@ class SetupPages {
 		);
 	}
 
-	public function arva_seo_crawl_page(): null {
+	public function arva_seo_crawl_page(): void {
 		$current_page = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 		$search_query = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 		$per_page = 20;
@@ -237,7 +237,7 @@ class SetupPages {
 		$current_page = min( $current_page, $total_pages );
 		$last_crawled_at = $this->crawl_results_repository->get_last_crawled_at();
 
-		return View::render(
+		View::render(
 			'admin.crawl',
 			[
 				'active_provider' => $this->provider_resolver->get_detected_provider_name(),
