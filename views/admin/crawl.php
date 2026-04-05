@@ -23,7 +23,13 @@
                 <p class="arva-seo-text-dark">
                     <?php
                     if ( $has_active_provider ) {
-                        echo esc_html( sprintf( 'Detected SEO provider: %s', $active_provider ) );
+                        echo esc_html(
+                            sprintf(
+								/* translator: %s: active SEO provider name */
+                                __( 'Detected SEO provider: %s', 'arva-seo' ),
+                                $active_provider
+                            )
+                        );
                     } elseif ( $provider_requires_premium ) {
                         echo esc_html( $provider_upgrade_message );
                     } else {
@@ -66,7 +72,7 @@
 					if ( in_array( $crawl_state['status'], [ 'running', 'paused' ], true ) ) {
 						echo esc_html(
 							sprintf(
-								/* translators: 1: processed items, 2: total items */
+								/* translator: 1: number of processed items, 2: total number of items */
 								__( 'Processed %1$d of %2$d items.', 'arva-seo' ),
 								(int) $crawl_state['processed'],
 								(int) $crawl_state['total']
@@ -107,7 +113,7 @@
             <p class="arva-seo-search-results-count">
 				<?php
 				printf(
-					/* translators: %d: number of search results */
+					/* translator: %d: number of search results */
 					esc_html__( '%d search results', 'arva-seo' ),
 					(int) $search_results_count
 				);

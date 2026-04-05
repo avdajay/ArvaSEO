@@ -54,7 +54,7 @@ class Licensing {
 
 	public function get_provider_upgrade_message( string $provider_name ): string {
 		return sprintf(
-			/* translators: %s: SEO provider name */
+			/* translator: %s: SEO provider name */
 			__( '%s support is available in ArvaSEO Premium. The free version includes Yoast SEO support only.', 'arva-seo' ),
 			$provider_name
 		);

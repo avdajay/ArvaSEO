@@ -71,13 +71,13 @@ class StartCrawler {
 		$summary = $this->crawl->crawl_batch( $limit, $start );
 		$message = $summary['done']
 			? sprintf(
-				/* translators: 1: number of crawled items, 2: SEO provider name */
+				/* translator: 1: number of crawled items, 2: SEO provider name */
 				__( 'Crawled %1$d items using %2$s.', 'arva-seo' ),
 				(int) $summary['crawled_count'],
 				$summary['provider']
 			)
 			: sprintf(
-				/* translators: 1: processed count, 2: total count, 3: provider name */
+				/* translator: 1: processed count, 2: total count, 3: SEO provider name */
 				__( 'Processed %1$d of %2$d items using %3$s.', 'arva-seo' ),
 				(int) $summary['processed'],
 				(int) $summary['total'],

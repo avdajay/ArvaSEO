@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              https://dajaydigital.com
- * @since             1.0.0
+ * @since             2.0.0
  * @package           Arva_Seo
  *
  * @wordpress-plugin
  * Plugin Name:       Arva SEO
  * Plugin URI:        https://dajaydigital.com/
  * Description:       Your Ultimate SEO Assistant. Created for SEO Specialist who do site audits and assist them with the process making SEO fixes more fun and easy!
- * Version:           1.0.0
+ * Version:           2.0.0
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Author:            Dajay Digital
@@ -34,10 +34,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Start at version 2.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'ARVA_SEO_VERSION', '1.0.0' );
+define( 'ARVA_SEO_VERSION', '2.0.0' );
 define( 'ARVA_SEO_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ARVA_SEO_URL', plugin_dir_url( __FILE__ ) );
 
@@ -148,7 +148,7 @@ if ( function_exists( 'arva_seo_fs' ) ) {
 	 * then kicking off the plugin from this point in the file does
 	 * not affect the page life cycle.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	function run_arva_seo() {
 
@@ -159,4 +159,3 @@ if ( function_exists( 'arva_seo_fs' ) ) {
 	run_arva_seo();
 
 }
-

@@ -1,4 +1,4 @@
-<div class="arva-seo-wrapper" <?php echo ! empty( $is_preview_load ) ? 'data-clear-preview-url="1"' : ''; ?>>
+<div class="arva-seo-wrapper"<?php echo ! empty( $is_preview_load ) ? ' data-clear-preview-url="' . esc_attr( '1' ) . '"' : ''; ?>>
     <h1 class="arva-seo-text-dark"><?php esc_html_e( 'Bulk Edit', 'arva-seo' ); ?></h1>
     <div class="arva-seo-container arva-seo-bg-lighter arva-seo-rounded arva-seo-bulk-toolbar">
         <div class="arva-seo-bulk-toolbar-copy">
@@ -6,7 +6,13 @@
             <p class="arva-seo-text-dark">
 				<?php
 				if ( $has_active_provider ) {
-					echo esc_html( sprintf( 'Detected SEO provider: %s', $active_provider ) );
+					echo esc_html(
+						sprintf(
+							/* translator: %s: active SEO provider name */
+							__( 'Detected SEO provider: %s', 'arva-seo' ),
+							$active_provider
+						)
+					);
 				} elseif ( $provider_requires_premium ) {
 					echo esc_html( $provider_upgrade_message );
 				} else {

@@ -48,6 +48,10 @@ class CrawlResultsRepository {
 		return $wpdb->prefix . 'arva_seo_crawl_results';
 	}
 
+	private function get_safe_table_name(): string {
+		return esc_sql( $this->get_table_name() );
+	}
+
 	public function ensure_schema(): void {
 		if ( self::SCHEMA_VERSION === get_option( 'arva_seo_crawl_schema_version' ) ) {
 			return;
@@ -106,13 +110,13 @@ class CrawlResultsRepository {
 	public function clear_all_results(): void {
 		global $wpdb;
 
-		$wpdb->query( "TRUNCATE TABLE {$this->get_table_name()}" );
+		$wpdb->query( 'TRUNCATE TABLE ' . $this->get_safe_table_name() );
 	}
 
 	public function delete_unsupported_post_type_results(): void {
 		global $wpdb;
 
-		$table_name = $this->get_table_name();
+		$table_name = $this->get_safe_table_name();
 		$where_sql = $this->get_supported_post_where_sql();
 
 		$wpdb->query( "DELETE FROM {$table_name} WHERE object_type <> 'post' OR NOT ( {$where_sql} )" );

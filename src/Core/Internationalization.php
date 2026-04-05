@@ -9,7 +9,7 @@ namespace ArvaSeo\Core;
  * so that it is ready for translation.
  *
  * @link       https://dajaydigital.com
- * @since      1.0.0
+ * @since      2.0.0
  *
  * @package    Arva_Seo
  * @subpackage Arva_Seo/includes
@@ -21,7 +21,7 @@ namespace ArvaSeo\Core;
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @since      1.0.0
+ * @since      2.0.0
  * @package    Arva_Seo
  * @subpackage Arva_Seo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
@@ -32,7 +32,7 @@ class Internationalization {
 	/**
 	 * Load the plugin text domain for translation.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	public function load_plugin_textdomain() {
 

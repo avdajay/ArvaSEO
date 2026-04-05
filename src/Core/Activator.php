@@ -9,7 +9,7 @@ use ArvaSeo\Services\SeoChecker;
  * Fired during plugin activation
  *
  * @link       https://dajaydigital.com
- * @since      1.0.0
+ * @since      2.0.0
  *
  * @package    Arva_Seo
  * @subpackage Arva_Seo/includes
@@ -20,7 +20,7 @@ use ArvaSeo\Services\SeoChecker;
  *
  * This class defines all code necessary to run during the plugin's activation.
  *
- * @since      1.0.0
+ * @since      2.0.0
  * @package    Arva_Seo
  * @subpackage Arva_Seo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
@@ -32,7 +32,7 @@ class Activator {
 	 *
 	 * Set up the plugin's initial state. And check for required dependencies.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	public static function activate(): void
 	{

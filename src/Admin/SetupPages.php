@@ -14,7 +14,7 @@ use ArvaSeo\Services\SeoProviderResolver;
  * The admin-specific functionality of the plugin.
  *
  * @link       https://dajaydigital.com
- * @since      1.0.0
+ * @since      2.0.0
  *
  * @package    Arva_Seo
  * @subpackage Arva_Seo/admin
@@ -35,7 +35,7 @@ class SetupPages {
 	/**
 	 * The ID of this plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 * @access   private
 	 * @var      string $plugin_name The ID of this plugin.
 	 */
@@ -44,7 +44,7 @@ class SetupPages {
 	/**
 	 * The version of this plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 * @access   private
 	 * @var      string $version The current version of this plugin.
 	 */
@@ -62,7 +62,7 @@ class SetupPages {
 	 * @param string $plugin_name The name of this plugin.
 	 * @param string $version The version of this plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	public function __construct(
 		string $plugin_name,
@@ -89,7 +89,7 @@ class SetupPages {
 	/**
 	 * Creates the admin menu for the plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	public function add_admin_menu(): void {
 		add_menu_page(

@@ -65,16 +65,24 @@ abstract class AbstractSeoProvider implements SeoService {
 	}
 
 	public function update_post_fields( int $post_id, array $fields ): void {
+		if ( $post_id <= 0 || ! get_post( $post_id ) ) {
+			throw new \InvalidArgumentException( 'Invalid post ID.' );
+		}
+
 		if ( array_key_exists( 'title', $fields ) && null !== $fields['title'] ) {
-			update_post_meta( $post_id, $this->get_title_meta_key(), (string) $fields['title'] );
+			update_post_meta( $post_id, $this->get_title_meta_key(), sanitize_text_field( (string) $fields['title'] ) );
 		}
 
 		if ( array_key_exists( 'description', $fields ) && null !== $fields['description'] ) {
-			update_post_meta( $post_id, $this->get_description_meta_key(), (string) $fields['description'] );
+			update_post_meta( $post_id, $this->get_description_meta_key(), sanitize_textarea_field( (string) $fields['description'] ) );
 		}
 
 		if ( array_key_exists( 'canonical_url', $fields ) && null !== $fields['canonical_url'] ) {
-			$this->update_post_canonical_url( $post_id, (string) $fields['canonical_url'] );
+			$canonical_url = esc_url_raw( (string) $fields['canonical_url'] );
+
+			if ( wp_http_validate_url( $canonical_url ) ) {
+				$this->update_post_canonical_url( $post_id, $canonical_url );
+			}
 		}
 
 		if ( array_key_exists( 'no_index', $fields ) && null !== $fields['no_index'] ) {

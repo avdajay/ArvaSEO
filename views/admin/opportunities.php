@@ -23,7 +23,7 @@
             <p class="arva-seo-summary-meta">
 				<?php
 				printf(
-					/* translators: %d: pages crawled */
+					/* translator: %d: number of crawled pages included in the score */
 					esc_html__( '%d crawled pages included in this score.', 'arva-seo' ),
 					(int) $dashboard['total_pages']
 				);
@@ -74,7 +74,7 @@
                     <p class="arva-seo-summary-meta">
 						<?php
 						printf(
-							/* translators: %d: issue count */
+							/* translator: %d: number of affected pages */
 							esc_html__( '%d affected pages found.', 'arva-seo' ),
 							(int) $opportunity_total
 						);
@@ -106,7 +106,7 @@
 								$image_values = is_array( $image_values ) ? array_filter( array_map( 'strval', $image_values ) ) : [];
 								$current_value = [] !== $image_values
 									? sprintf(
-										/* translators: 1: number of images missing alt text, 2: image sources */
+										/* translator: 1: number of images missing alt text, 2: list of image sources */
 										__( '%1$d missing alt image(s): %2$s', 'arva-seo' ),
 										(int) ( $item['missing_image_alt_count'] ?? 0 ),
 										implode( ' | ', $image_values )

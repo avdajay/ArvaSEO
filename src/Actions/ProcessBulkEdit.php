@@ -43,8 +43,27 @@ class ProcessBulkEdit {
 			wp_send_json_error( [ 'message' => __( 'Preview data is invalid.', 'arva-seo' ) ], 400 );
 		}
 
-		$normalized_rows = array_map( [ $this, 'normalize_preview_row' ], $rows );
+		$normalized_rows = [];
 		$user_id = get_current_user_id();
+
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$normalized_row = $this->normalize_preview_row( $row, $provider );
+
+			if ( [] === $normalized_row ) {
+				continue;
+			}
+
+			$normalized_rows[] = $normalized_row;
+		}
+
+		if ( [] === $normalized_rows ) {
+			wp_send_json_error( [ 'message' => __( 'No valid rows were found to process.', 'arva-seo' ) ], 400 );
+		}
+
 		$this->repository->save_preview_rows( $user_id, $normalized_rows );
 		$state = $this->repository->reset_state( $user_id, count( $normalized_rows ) );
 
@@ -84,6 +103,14 @@ class ProcessBulkEdit {
 		$last_error = '';
 
 		foreach ( $batch as $row ) {
+			$post_id = isset( $row['post_id'] ) ? absint( $row['post_id'] ) : 0;
+
+			if ( $post_id <= 0 || ! $this->is_supported_post_type( $post_id ) || ! get_post( $post_id ) ) {
+				$errors++;
+				$last_error = __( 'A bulk edit row references an invalid post.', 'arva-seo' );
+				continue;
+			}
+
 			$fields = [
 				'title' => $this->empty_to_null( $row['new_title'] ?? null ),
 				'description' => $this->empty_to_null( $row['new_description'] ?? null ),
@@ -98,7 +125,7 @@ class ProcessBulkEdit {
 			}
 
 			try {
-				$provider->update_post_fields( (int) $row['post_id'], $fields );
+				$provider->update_post_fields( $post_id, $fields );
 				$updated++;
 			} catch ( \Throwable $throwable ) {
 				$errors++;
@@ -131,7 +158,7 @@ class ProcessBulkEdit {
 				'message' => $done
 					? __( 'Bulk edit completed. Go back to the Crawl page and re-crawl to verify the updated values.', 'arva-seo' )
 					: sprintf(
-						/* translators: 1: processed rows, 2: total rows */
+						/* translator: 1: number of processed rows, 2: total number of rows */
 						__( 'Processed %1$d of %2$d rows.', 'arva-seo' ),
 						$processed,
 						count( $rows )
@@ -142,22 +169,59 @@ class ProcessBulkEdit {
 		);
 	}
 
-	private function normalize_preview_row( array $row ): array {
+	private function normalize_preview_row( array $row, $provider ): array {
+		$post_id = isset( $row['post_id'] ) ? absint( $row['post_id'] ) : 0;
+
+		if ( $post_id <= 0 || ! $this->is_supported_post_type( $post_id ) || ! get_post( $post_id ) ) {
+			return [];
+		}
+
+		$url = get_permalink( $post_id );
+		$page_title = get_the_title( $post_id );
+
+		if ( ! is_string( $url ) || '' === $url ) {
+			return [];
+		}
+
 		return [
-			'post_id' => isset( $row['post_id'] ) ? (int) $row['post_id'] : 0,
-			'url' => isset( $row['url'] ) ? (string) $row['url'] : '',
-			'page_title' => isset( $row['page_title'] ) ? (string) $row['page_title'] : '',
-			'old_title' => isset( $row['old_title'] ) ? (string) $row['old_title'] : '',
-			'new_title' => $this->empty_to_null( $row['new_title'] ?? null ),
-			'old_description' => isset( $row['old_description'] ) ? (string) $row['old_description'] : '',
-			'new_description' => $this->empty_to_null( $row['new_description'] ?? null ),
-			'old_canonical_url' => isset( $row['old_canonical_url'] ) ? (string) $row['old_canonical_url'] : '',
-			'new_canonical_url' => $this->empty_to_null( $row['new_canonical_url'] ?? null ),
-			'old_no_follow' => ! empty( $row['old_no_follow'] ),
+			'post_id' => $post_id,
+			'url' => $url,
+			'page_title' => is_string( $page_title ) ? $page_title : '',
+			'old_title' => $provider->get_post_title( $post_id ),
+			'new_title' => $this->normalize_title_value( $row['new_title'] ?? null ),
+			'old_description' => $provider->get_post_description( $post_id ),
+			'new_description' => $this->normalize_description_value( $row['new_description'] ?? null ),
+			'old_canonical_url' => $provider->get_post_canonical_url( $post_id ),
+			'new_canonical_url' => $this->normalize_canonical_value( $row['new_canonical_url'] ?? null ),
+			'old_no_follow' => $provider->is_post_nofollow( $post_id ),
 			'new_no_follow' => $this->normalize_nullable_bool( $row['new_no_follow'] ?? null ),
-			'old_no_index' => ! empty( $row['old_no_index'] ),
+			'old_no_index' => $provider->is_post_noindex( $post_id ),
 			'new_no_index' => $this->normalize_nullable_bool( $row['new_no_index'] ?? null ),
 		];
+	}
+
+	private function normalize_title_value( $value ): ?string {
+		$value = $this->empty_to_null( $value );
+
+		return null === $value ? null : sanitize_text_field( $value );
+	}
+
+	private function normalize_description_value( $value ): ?string {
+		$value = $this->empty_to_null( $value );
+
+		return null === $value ? null : sanitize_textarea_field( $value );
+	}
+
+	private function normalize_canonical_value( $value ): ?string {
+		$value = $this->empty_to_null( $value );
+
+		if ( null === $value ) {
+			return null;
+		}
+
+		$value = esc_url_raw( $value );
+
+		return wp_http_validate_url( $value ) ? $value : null;
 	}
 
 	private function empty_to_null( $value ): ?string {
@@ -200,5 +264,9 @@ class ProcessBulkEdit {
 		}
 
 		return false;
+	}
+
+	private function is_supported_post_type( int $post_id ): bool {
+		return in_array( get_post_type( $post_id ), [ 'post', 'page', 'product' ], true );
 	}
 }

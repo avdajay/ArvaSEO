@@ -5,7 +5,7 @@ Tags: arva seo, seo, bulk seo editor, bulk seo meta editor, bulk seo meta update
 Requires at least: 6.6
 Requires PHP: 8.2
 Tested up to: 6.9
-Stable tag: 1.0.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,13 +47,15 @@ Yes, please send us an email directly at the Contact Us screen.
 2. Crawl
 3. Bulk Edit
 4. Settings
+5. Bulk Edit Preview
+6. Bulk Edit Preview with Start Processing Button
 
 == Changelog ==
 
-= 1.0.0 =
+= 2.0.0 =
 * Initial version release.
 
 == Upgrade Notice ==
 
-= 1.0.0 =
+= 2.0.0 =
 * Initial version release.

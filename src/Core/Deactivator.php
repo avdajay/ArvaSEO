@@ -6,7 +6,7 @@ namespace ArvaSeo\Core;
  * Fired during plugin deactivation
  *
  * @link       https://dajaydigital.com
- * @since      1.0.0
+ * @since      2.0.0
  *
  * @package    Arva_Seo
  * @subpackage Arva_Seo/includes
@@ -17,7 +17,7 @@ namespace ArvaSeo\Core;
  *
  * This class defines all code necessary to run during the plugin's deactivation.
  *
- * @since      1.0.0
+ * @since      2.0.0
  * @package    Arva_Seo
  * @subpackage Arva_Seo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
@@ -29,7 +29,7 @@ class Deactivator {
 	 *
 	 * Long Description.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	public static function deactivate() {
 	}

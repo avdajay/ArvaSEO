@@ -27,7 +27,7 @@ use ArvaSeo\Services\SeoProviderResolver;
  * public-facing side of the site and the admin area.
  *
  * @link       https://dajaydigital.com
- * @since      1.0.0
+ * @since      2.0.0
  *
  * @package    Arva_Seo
  * @subpackage Arva_Seo/includes
@@ -42,7 +42,7 @@ use ArvaSeo\Services\SeoProviderResolver;
  * Also maintains the unique identifier of this plugin as well as the current
  * version of the plugin.
  *
- * @since      1.0.0
+ * @since      2.0.0
  * @package    Arva_Seo
  * @subpackage Arva_Seo/includes
  * @author     Dajay Digital <aries@dajaydigital.com>
@@ -53,7 +53,7 @@ class Bootstrap {
 	 * The loader that's responsible for maintaining and registering all hooks that power
 	 * the plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 * @access   protected
 	 * @var      Hooks $loader Maintains and registers all hooks for the plugin.
 	 */
@@ -62,7 +62,7 @@ class Bootstrap {
 	/**
 	 * The unique identifier of this plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 * @access   protected
 	 * @var      string $plugin_name The string used to uniquely identify this plugin.
 	 */
@@ -71,7 +71,7 @@ class Bootstrap {
 	/**
 	 * The current version of the plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 * @access   protected
 	 * @var      string $version The current version of the plugin.
 	 */
@@ -84,14 +84,14 @@ class Bootstrap {
 	 * Load the dependencies, define the locale, and set the hooks for the admin area and
 	 * the public-facing side of the site.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	public function __construct()
 	{
 		if ( defined( 'ARVA_SEO_VERSION' ) ) {
 			$this->version = ARVA_SEO_VERSION;
 		} else {
-			$this->version = '1.0.0';
+			$this->version = '2.0.0';
 		}
 		$this->plugin_name = 'arva-seo';
 
@@ -113,7 +113,7 @@ class Bootstrap {
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 * @access   private
 	 */
 	private function init_hooks(): void
@@ -127,7 +127,7 @@ class Bootstrap {
 	 * Uses the Arva_Seo_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 * @access   private
 	 */
 	private function set_locale(): void
@@ -141,7 +141,7 @@ class Bootstrap {
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 * @access   private
 	 */
 	private function load_hooks(): void
@@ -192,7 +192,7 @@ class Bootstrap {
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
 	 *
-	 * @since    1.0.0
+	 * @since    2.0.0
 	 */
 	public function run(): void
 	{
@@ -204,7 +204,7 @@ class Bootstrap {
 	 * WordPress and to define internationalization functionality.
 	 *
 	 * @return    string    The name of the plugin.
-	 * @since     1.0.0
+	 * @since     2.0.0
 	 */
 	public function get_plugin_name(): string
 	{
@@ -215,7 +215,7 @@ class Bootstrap {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @return    Hooks    Orchestrates the hooks of the plugin.
-	 * @since     1.0.0
+	 * @since     2.0.0
 	 */
 	public function get_loader(): Hooks
 	{
@@ -226,7 +226,7 @@ class Bootstrap {
 	 * Retrieve the version number of the plugin.
 	 *
 	 * @return    string    The version number of the plugin.
-	 * @since     1.0.0
+	 * @since     2.0.0
 	 */
 	public function get_version(): string
 	{

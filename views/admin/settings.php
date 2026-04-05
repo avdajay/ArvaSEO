@@ -1,4 +1,4 @@
-<div class="arva-seo-wrapper">
+    <div class="arva-seo-wrapper">
     <h1 class="arva-seo-text-dark"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 	<?php if ( '' !== $settings_notice ) : ?>
         <div class="notice notice-success is-dismissible">
@@ -23,7 +23,12 @@
             <div class="arva-seo-settings-control">
                 <p><?php esc_html_e( 'Adjust how many crawl rows are processed per batch request.', 'arva-seo' ); ?></p>
                 <input type="number" name="crawl_batch_size" min="<?php echo esc_attr( $min_batch_size ); ?>" max="<?php echo esc_attr( $max_batch_size ); ?>" value="<?php echo esc_attr( (int) $settings['crawl_batch_size'] ); ?>">
-                <p class="description"><?php echo esc_html( sprintf( __( 'Minimum %1$d, maximum %2$d per batch.', 'arva-seo' ), $min_batch_size, $max_batch_size ) ); ?></p>
+                <p class="description">
+					<?php
+					/* translator: 1: minimum batch size, 2: maximum batch size */
+					echo esc_html( sprintf( __( 'Minimum %1$d, maximum %2$d per batch.', 'arva-seo' ), $min_batch_size, $max_batch_size ) );
+					?>
+                </p>
             </div>
         </div>
 
@@ -34,7 +39,12 @@
             <div class="arva-seo-settings-control">
                 <p><?php esc_html_e( 'Adjust how many bulk edit rows are updated per batch request.', 'arva-seo' ); ?></p>
                 <input type="number" name="bulk_edit_batch_size" min="<?php echo esc_attr( $min_batch_size ); ?>" max="<?php echo esc_attr( $max_batch_size ); ?>" value="<?php echo esc_attr( (int) $settings['bulk_edit_batch_size'] ); ?>">
-                <p class="description"><?php echo esc_html( sprintf( __( 'Minimum %1$d, maximum %2$d per batch.', 'arva-seo' ), $min_batch_size, $max_batch_size ) ); ?></p>
+                <p class="description">
+					<?php
+					/* translator: 1: minimum batch size, 2: maximum batch size */
+					echo esc_html( sprintf( __( 'Minimum %1$d, maximum %2$d per batch.', 'arva-seo' ), $min_batch_size, $max_batch_size ) );
+					?>
+                </p>
             </div>
         </div>
 

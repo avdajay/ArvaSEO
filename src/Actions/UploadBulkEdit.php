@@ -7,6 +7,8 @@ use ArvaSeo\Services\Licensing;
 use ArvaSeo\Services\SeoProviderResolver;
 
 class UploadBulkEdit {
+	private const REQUIRED_HEADERS = [ 'URL' ];
+	private const ALLOWED_HEADERS = [ 'URL', 'TITLE', 'DESCRIPTION', 'CANONICAL_URL', 'NO_FOLLOW', 'NO_INDEX' ];
 
 	private SeoProviderResolver $resolver;
 	private BulkEditRepository $repository;
@@ -35,8 +37,19 @@ class UploadBulkEdit {
 			$this->redirect_with_notice( 'no-provider' );
 		}
 
-		if ( ! isset( $_FILES['bulk_edit_file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['bulk_edit_file']['tmp_name'] ) ) {
+		if ( ! isset( $_FILES['bulk_edit_file']['tmp_name'], $_FILES['bulk_edit_file']['name'], $_FILES['bulk_edit_file']['error'] ) ) {
 			$this->redirect_with_notice( 'missing-file' );
+		}
+
+		if ( UPLOAD_ERR_OK !== (int) $_FILES['bulk_edit_file']['error'] || ! is_uploaded_file( $_FILES['bulk_edit_file']['tmp_name'] ) ) {
+			$this->redirect_with_notice( 'missing-file' );
+		}
+
+		$file_name = sanitize_file_name( wp_unslash( $_FILES['bulk_edit_file']['name'] ) );
+		$file_type = wp_check_filetype_and_ext( $_FILES['bulk_edit_file']['tmp_name'], $file_name );
+
+		if ( empty( $file_type['ext'] ) || 'csv' !== strtolower( (string) $file_type['ext'] ) ) {
+			$this->redirect_with_notice( 'invalid-file' );
 		}
 
 		$handle = fopen( $_FILES['bulk_edit_file']['tmp_name'], 'r' );
@@ -53,11 +66,18 @@ class UploadBulkEdit {
 		}
 
 		$normalized_headers = array_map( [ $this, 'normalize_header' ], $headers );
+
+		if ( ! $this->has_valid_headers( $normalized_headers ) ) {
+			fclose( $handle );
+			$this->redirect_with_notice( 'invalid-file' );
+		}
+
 		$rows = [];
+		$seen_post_ids = [];
 
 		while ( false !== ( $data = fgetcsv( $handle ) ) ) {
 			$row = $this->map_row( $normalized_headers, $data );
-			$url = trim( (string) ( $row['url'] ?? '' ) );
+			$url = $this->normalize_url_value( $row['url'] ?? null );
 
 			if ( '' === $url ) {
 				continue;
@@ -66,6 +86,10 @@ class UploadBulkEdit {
 			$post_id = $provider->get_post_id( $url );
 
 			if ( $post_id <= 0 ) {
+				continue;
+			}
+
+			if ( isset( $seen_post_ids[ $post_id ] ) ) {
 				continue;
 			}
 
@@ -85,9 +109,11 @@ class UploadBulkEdit {
 				continue;
 			}
 
+			$seen_post_ids[ $post_id ] = true;
+
 			$rows[] = [
 				'post_id' => $post_id,
-				'url' => $url,
+				'url' => (string) get_permalink( $post_id ),
 				'page_title' => get_the_title( $post_id ),
 				'old_title' => $provider->get_post_title( $post_id ),
 				'new_title' => $new_values['title'],
@@ -117,6 +143,24 @@ class UploadBulkEdit {
 		return str_replace( ' ', '_', $header );
 	}
 
+	private function has_valid_headers( array $headers ): bool {
+		$headers = array_values( array_unique( array_filter( array_map( 'strval', $headers ) ) ) );
+
+		foreach ( self::REQUIRED_HEADERS as $required_header ) {
+			if ( ! in_array( $required_header, $headers, true ) ) {
+				return false;
+			}
+		}
+
+		foreach ( $headers as $header ) {
+			if ( ! in_array( $header, self::ALLOWED_HEADERS, true ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private function map_row( array $headers, array $data ): array {
 		$row = [];
 
@@ -135,6 +179,22 @@ class UploadBulkEdit {
 		$value = trim( $value );
 
 		return '' === $value ? null : $value;
+	}
+
+	private function normalize_url_value( $value ): string {
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+
+		$value = trim( $value );
+
+		if ( '' === $value ) {
+			return '';
+		}
+
+		$value = esc_url_raw( $value );
+
+		return wp_http_validate_url( $value ) ? $value : '';
 	}
 
 	private function normalize_bool_value( $value ): ?bool {
