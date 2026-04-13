@@ -297,22 +297,22 @@ class CrawlResultsRepository {
 
 		$score_bands = [
 			'critical' => [
-				'label' => __( 'Critical', 'arva-seo' ),
+				'label' => __( 'Critical', 'bulk-meta-editor' ),
 				'range' => '0-39',
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score < 40" ),
 			],
 			'warning' => [
-				'label' => __( 'Needs Work', 'arva-seo' ),
+				'label' => __( 'Needs Work', 'bulk-meta-editor' ),
 				'range' => '40-59',
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score BETWEEN 40 AND 59" ),
 			],
 			'good' => [
-				'label' => __( 'Good', 'arva-seo' ),
+				'label' => __( 'Good', 'bulk-meta-editor' ),
 				'range' => '60-79',
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score BETWEEN 60 AND 79" ),
 			],
 			'healthy' => [
-				'label' => __( 'Strong', 'arva-seo' ),
+				'label' => __( 'Strong', 'bulk-meta-editor' ),
 				'range' => '80-100',
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND score >= 80" ),
 			],
@@ -320,43 +320,43 @@ class CrawlResultsRepository {
 
 		$opportunities = [
 			'title_missing' => [
-				'label' => __( 'Missing SEO Titles', 'arva-seo' ),
-				'description' => __( 'Pages with no SEO title set.', 'arva-seo' ),
+				'label' => __( 'Missing SEO Titles', 'bulk-meta-editor' ),
+				'description' => __( 'Pages with no SEO title set.', 'bulk-meta-editor' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_title = ''" ),
 			],
 			'title_length' => [
-				'label' => __( 'SEO Titles Out Of Range', 'arva-seo' ),
-				'description' => __( 'Titles shorter than 30 or longer than 60 characters.', 'arva-seo' ),
+				'label' => __( 'SEO Titles Out Of Range', 'bulk-meta-editor' ),
+				'description' => __( 'Titles shorter than 30 or longer than 60 characters.', 'bulk-meta-editor' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_title <> '' AND (CHAR_LENGTH(seo_title) < 30 OR CHAR_LENGTH(seo_title) > 60)" ),
 			],
 			'description_missing' => [
-				'label' => __( 'Missing Meta Descriptions', 'arva-seo' ),
-				'description' => __( 'Pages with no meta description set.', 'arva-seo' ),
+				'label' => __( 'Missing Meta Descriptions', 'bulk-meta-editor' ),
+				'description' => __( 'Pages with no meta description set.', 'bulk-meta-editor' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_description = ''" ),
 			],
 			'description_length' => [
-				'label' => __( 'Descriptions Out Of Range', 'arva-seo' ),
-				'description' => __( 'Descriptions shorter than 120 or longer than 160 characters.', 'arva-seo' ),
+				'label' => __( 'Descriptions Out Of Range', 'bulk-meta-editor' ),
+				'description' => __( 'Descriptions shorter than 120 or longer than 160 characters.', 'bulk-meta-editor' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND seo_description <> '' AND (CHAR_LENGTH(seo_description) < 120 OR CHAR_LENGTH(seo_description) > 160)" ),
 			],
 			'h1_missing' => [
-				'label' => __( 'Missing H1 Headings', 'arva-seo' ),
-				'description' => __( 'Pages where no H1 heading was found in the rendered content.', 'arva-seo' ),
+				'label' => __( 'Missing H1 Headings', 'bulk-meta-editor' ),
+				'description' => __( 'Pages where no H1 heading was found in the rendered content.', 'bulk-meta-editor' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND h1_count = 0" ),
 			],
 			'h1_multiple' => [
-				'label' => __( 'Multiple H1 Headings', 'arva-seo' ),
-				'description' => __( 'Pages where more than one H1 heading was found.', 'arva-seo' ),
+				'label' => __( 'Multiple H1 Headings', 'bulk-meta-editor' ),
+				'description' => __( 'Pages where more than one H1 heading was found.', 'bulk-meta-editor' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND h1_count > 1" ),
 			],
 			'h1_duplicate' => [
-				'label' => __( 'Duplicate H1 Headings', 'arva-seo' ),
-				'description' => __( 'Pages where duplicate H1 text was found.', 'arva-seo' ),
+				'label' => __( 'Duplicate H1 Headings', 'bulk-meta-editor' ),
+				'description' => __( 'Pages where duplicate H1 text was found.', 'bulk-meta-editor' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND has_duplicate_h1 = 1" ),
 			],
 			'image_alt_missing' => [
-				'label' => __( 'Missing Image Alt Text', 'arva-seo' ),
-				'description' => __( 'Pages where one or more images are missing alt text.', 'arva-seo' ),
+				'label' => __( 'Missing Image Alt Text', 'bulk-meta-editor' ),
+				'description' => __( 'Pages where one or more images are missing alt text.', 'bulk-meta-editor' ),
 				'count' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql} AND missing_image_alt_count > 0" ),
 			],
 		];

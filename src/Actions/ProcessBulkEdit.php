@@ -22,25 +22,25 @@ class ProcessBulkEdit {
 
 	public function save_preview(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'You are not allowed to process bulk edits.', 'arva-seo' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'You are not allowed to process bulk edits.', 'bulk-meta-editor' ) ], 403 );
 		}
 
 		check_ajax_referer( 'arva_seo_bulk_edit_process', 'nonce' );
 
 		if ( $this->resolver->detected_provider_requires_premium() ) {
-			wp_send_json_error( [ 'message' => __( 'This SEO provider requires ArvaSEO Premium.', 'arva-seo' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
+			wp_send_json_error( [ 'message' => __( 'This SEO provider requires ArvaSEO Premium.', 'bulk-meta-editor' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
 		}
 
 		$provider = $this->resolver->resolve();
 
 		if ( ! $provider->is_active() ) {
-			wp_send_json_error( [ 'message' => __( 'No supported SEO plugin is active.', 'arva-seo' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
+			wp_send_json_error( [ 'message' => __( 'No supported SEO plugin is active.', 'bulk-meta-editor' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
 		}
 
 		$rows = isset( $_POST['rows'] ) ? json_decode( wp_unslash( $_POST['rows'] ), true ) : null;
 
 		if ( ! is_array( $rows ) ) {
-			wp_send_json_error( [ 'message' => __( 'Preview data is invalid.', 'arva-seo' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'Preview data is invalid.', 'bulk-meta-editor' ) ], 400 );
 		}
 
 		$normalized_rows = [];
@@ -61,7 +61,7 @@ class ProcessBulkEdit {
 		}
 
 		if ( [] === $normalized_rows ) {
-			wp_send_json_error( [ 'message' => __( 'No valid rows were found to process.', 'arva-seo' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'No valid rows were found to process.', 'bulk-meta-editor' ) ], 400 );
 		}
 
 		$this->repository->save_preview_rows( $user_id, $normalized_rows );
@@ -69,7 +69,7 @@ class ProcessBulkEdit {
 
 		wp_send_json_success(
 			[
-				'message' => __( 'Preview saved. Starting bulk update.', 'arva-seo' ),
+				'message' => __( 'Preview saved. Starting bulk update.', 'bulk-meta-editor' ),
 				'state' => $state,
 			]
 		);
@@ -77,19 +77,19 @@ class ProcessBulkEdit {
 
 	public function process_batch(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'You are not allowed to process bulk edits.', 'arva-seo' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'You are not allowed to process bulk edits.', 'bulk-meta-editor' ) ], 403 );
 		}
 
 		check_ajax_referer( 'arva_seo_bulk_edit_process', 'nonce' );
 
 		if ( $this->resolver->detected_provider_requires_premium() ) {
-			wp_send_json_error( [ 'message' => __( 'This SEO provider requires ArvaSEO Premium.', 'arva-seo' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
+			wp_send_json_error( [ 'message' => __( 'This SEO provider requires ArvaSEO Premium.', 'bulk-meta-editor' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
 		}
 
 		$provider = $this->resolver->resolve();
 
 		if ( ! $provider->is_active() ) {
-			wp_send_json_error( [ 'message' => __( 'No supported SEO plugin is active.', 'arva-seo' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
+			wp_send_json_error( [ 'message' => __( 'No supported SEO plugin is active.', 'bulk-meta-editor' ), 'upgrade_url' => $this->licensing->get_upgrade_url() ], 400 );
 		}
 
 		$user_id = get_current_user_id();
@@ -107,7 +107,7 @@ class ProcessBulkEdit {
 
 			if ( $post_id <= 0 || ! $this->is_supported_post_type( $post_id ) || ! get_post( $post_id ) ) {
 				$errors++;
-				$last_error = __( 'A bulk edit row references an invalid post.', 'arva-seo' );
+				$last_error = __( 'A bulk edit row references an invalid post.', 'bulk-meta-editor' );
 				continue;
 			}
 
@@ -148,7 +148,7 @@ class ProcessBulkEdit {
 				'percentage' => $percentage,
 				'last_error' => $last_error,
 				'completed_message' => $done
-					? __( 'Bulk edit completed. Go back to the Crawl page and re-crawl to verify the updated values.', 'arva-seo' )
+					? __( 'Bulk edit completed. Go back to the Crawl page and re-crawl to verify the updated values.', 'bulk-meta-editor' )
 					: '',
 			]
 		);
@@ -156,10 +156,10 @@ class ProcessBulkEdit {
 		wp_send_json_success(
 			[
 				'message' => $done
-					? __( 'Bulk edit completed. Go back to the Crawl page and re-crawl to verify the updated values.', 'arva-seo' )
+					? __( 'Bulk edit completed. Go back to the Crawl page and re-crawl to verify the updated values.', 'bulk-meta-editor' )
 					: sprintf(
 						/* translator: 1: number of processed rows, 2: total number of rows */
-						__( 'Processed %1$d of %2$d rows.', 'arva-seo' ),
+						__( 'Processed %1$d of %2$d rows.', 'bulk-meta-editor' ),
 						$processed,
 						count( $rows )
 					),

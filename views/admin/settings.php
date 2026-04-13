@@ -5,7 +5,7 @@
             <p>
 				<?php
 				$messages = [
-					'saved' => __( 'Settings saved.', 'arva-seo' ),
+					'saved' => __( 'Settings saved.', 'bulk-meta-editor' ),
 				];
 				echo esc_html( $messages[ $settings_notice ] ?? $settings_notice );
 				?>
@@ -18,15 +18,15 @@
 
         <div class="arva-seo-settings-row">
             <div class="arva-seo-settings-label">
-                <h3><?php esc_html_e( 'Crawl Batch Size', 'arva-seo' ); ?></h3>
+                <h3><?php esc_html_e( 'Crawl Batch Size', 'bulk-meta-editor' ); ?></h3>
             </div>
             <div class="arva-seo-settings-control">
-                <p><?php esc_html_e( 'Adjust how many crawl rows are processed per batch request.', 'arva-seo' ); ?></p>
+                <p><?php esc_html_e( 'Adjust how many crawl rows are processed per batch request.', 'bulk-meta-editor' ); ?></p>
                 <input type="number" name="crawl_batch_size" min="<?php echo esc_attr( $min_batch_size ); ?>" max="<?php echo esc_attr( $max_batch_size ); ?>" value="<?php echo esc_attr( (int) $settings['crawl_batch_size'] ); ?>">
                 <p class="description">
 					<?php
 					/* translator: 1: minimum batch size, 2: maximum batch size */
-					echo esc_html( sprintf( __( 'Minimum %1$d, maximum %2$d per batch.', 'arva-seo' ), $min_batch_size, $max_batch_size ) );
+					echo esc_html( sprintf( __( 'Minimum %1$d, maximum %2$d per batch.', 'bulk-meta-editor' ), $min_batch_size, $max_batch_size ) );
 					?>
                 </p>
             </div>
@@ -34,15 +34,15 @@
 
         <div class="arva-seo-settings-row">
             <div class="arva-seo-settings-label">
-                <h3><?php esc_html_e( 'Bulk Edit Batch Size', 'arva-seo' ); ?></h3>
+                <h3><?php esc_html_e( 'Bulk Edit Batch Size', 'bulk-meta-editor' ); ?></h3>
             </div>
             <div class="arva-seo-settings-control">
-                <p><?php esc_html_e( 'Adjust how many bulk edit rows are updated per batch request.', 'arva-seo' ); ?></p>
+                <p><?php esc_html_e( 'Adjust how many bulk edit rows are updated per batch request.', 'bulk-meta-editor' ); ?></p>
                 <input type="number" name="bulk_edit_batch_size" min="<?php echo esc_attr( $min_batch_size ); ?>" max="<?php echo esc_attr( $max_batch_size ); ?>" value="<?php echo esc_attr( (int) $settings['bulk_edit_batch_size'] ); ?>">
                 <p class="description">
 					<?php
 					/* translator: 1: minimum batch size, 2: maximum batch size */
-					echo esc_html( sprintf( __( 'Minimum %1$d, maximum %2$d per batch.', 'arva-seo' ), $min_batch_size, $max_batch_size ) );
+					echo esc_html( sprintf( __( 'Minimum %1$d, maximum %2$d per batch.', 'bulk-meta-editor' ), $min_batch_size, $max_batch_size ) );
 					?>
                 </p>
             </div>
@@ -50,19 +50,19 @@
 
         <div class="arva-seo-settings-row">
             <div class="arva-seo-settings-label">
-                <h3><?php esc_html_e( 'Delete Data on Uninstall', 'arva-seo' ); ?></h3>
+                <h3><?php esc_html_e( 'Delete Data on Uninstall', 'bulk-meta-editor' ); ?></h3>
             </div>
             <div class="arva-seo-settings-control">
-                <p><?php esc_html_e( 'Delete plugin crawl data and settings when the plugin is uninstalled.', 'arva-seo' ); ?></p>
+                <p><?php esc_html_e( 'Delete plugin crawl data and settings when the plugin is uninstalled.', 'bulk-meta-editor' ); ?></p>
                 <label>
                     <input type="checkbox" name="delete_data_on_uninstall" value="1" <?php checked( ! empty( $settings['delete_data_on_uninstall'] ) ); ?>>
-					<?php esc_html_e( 'Delete all plugin data on uninstall', 'arva-seo' ); ?>
+					<?php esc_html_e( 'Delete all plugin data on uninstall', 'bulk-meta-editor' ); ?>
                 </label>
             </div>
         </div>
 
         <div class="arva-seo-settings-actions">
-            <button class="arva-seo-btn-primary" type="submit"><?php esc_html_e( 'Save Settings', 'arva-seo' ); ?></button>
+            <button class="arva-seo-btn-primary" type="submit"><?php esc_html_e( 'Save Settings', 'bulk-meta-editor' ); ?></button>
         </div>
     </form>
 </div>

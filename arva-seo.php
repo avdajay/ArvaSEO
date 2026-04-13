@@ -13,17 +13,17 @@
  * @package           Arva_Seo
  *
  * @wordpress-plugin
- * Plugin Name:       Arva SEO
+ * Plugin Name:       Arva SEO (formerly Bulk Meta Editor)
  * Plugin URI:        https://dajaydigital.com/
  * Description:       Your Ultimate SEO Assistant. Created for SEO Specialist who do site audits and assist them with the process making SEO fixes more fun and easy!
- * Version:           2.0.0
+ * Version:           2.0.1
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Author:            Dajay Digital
  * Author URI:        https://dajaydigital.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       arva-seo
+ * Text Domain:       bulk-meta-editor
  * Domain Path:       /languages
  */
 
@@ -34,10 +34,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Currently plugin version.
- * Start at version 2.0.0 and use SemVer - https://semver.org
+ * Start at version 2.0.1 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'ARVA_SEO_VERSION', '2.0.0' );
+define( 'ARVA_SEO_VERSION', '2.0.1' );
 define( 'ARVA_SEO_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ARVA_SEO_URL', plugin_dir_url( __FILE__ ) );
 

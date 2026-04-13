@@ -17,7 +17,7 @@ class ResetCrawlData {
 
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to reset crawl data.', 'arva-seo' ) );
+			wp_die( esc_html__( 'You are not allowed to reset crawl data.', 'bulk-meta-editor' ) );
 		}
 
 		check_admin_referer( 'arva_seo_reset_crawl_data', 'arva_seo_reset_nonce' );

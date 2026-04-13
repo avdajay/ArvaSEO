@@ -17,7 +17,7 @@ class ExportCrawl {
 
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to export crawl data.', 'arva-seo' ) );
+			wp_die( esc_html__( 'You are not allowed to export crawl data.', 'bulk-meta-editor' ) );
 		}
 
 		check_admin_referer( 'arva_seo_export_crawl', 'arva_seo_export_nonce' );
@@ -42,7 +42,7 @@ class ExportCrawl {
 		$output = fopen( 'php://output', 'w' );
 
 		if ( false === $output ) {
-			wp_die( esc_html__( 'Unable to generate export file.', 'arva-seo' ) );
+			wp_die( esc_html__( 'Unable to generate export file.', 'bulk-meta-editor' ) );
 		}
 
 		fputcsv(

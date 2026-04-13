@@ -14,7 +14,7 @@ class SaveSettings {
 
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to save settings.', 'arva-seo' ) );
+			wp_die( esc_html__( 'You are not allowed to save settings.', 'bulk-meta-editor' ) );
 		}
 
 		check_admin_referer( 'arva_seo_save_settings', 'arva_seo_settings_nonce' );

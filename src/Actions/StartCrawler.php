@@ -19,7 +19,7 @@ class StartCrawler {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error(
 				[
-					'message' => __( 'You are not allowed to start the crawl.', 'arva-seo' ),
+					'message' => __( 'You are not allowed to start the crawl.', 'bulk-meta-editor' ),
 				],
 				403
 			);
@@ -51,10 +51,10 @@ class StartCrawler {
 		}
 
 		if ( ! $this->crawl->is_available() ) {
-			$message = __( 'No supported SEO plugin is active.', 'arva-seo' );
+			$message = __( 'No supported SEO plugin is active.', 'bulk-meta-editor' );
 
 			if ( $this->licensing->is_free_user() ) {
-				$message = __( 'The free version supports Yoast SEO only. Upgrade to use Rank Math, All in One SEO, or SEOPress.', 'arva-seo' );
+				$message = __( 'The free version supports Yoast SEO only. Upgrade to use Rank Math, All in One SEO, or SEOPress.', 'bulk-meta-editor' );
 			}
 
 			wp_send_json_error(
@@ -72,13 +72,13 @@ class StartCrawler {
 		$message = $summary['done']
 			? sprintf(
 				/* translator: 1: number of crawled items, 2: SEO provider name */
-				__( 'Crawled %1$d items using %2$s.', 'arva-seo' ),
+				__( 'Crawled %1$d items using %2$s.', 'bulk-meta-editor' ),
 				(int) $summary['crawled_count'],
 				$summary['provider']
 			)
 			: sprintf(
 				/* translator: 1: processed count, 2: total count, 3: SEO provider name */
-				__( 'Processed %1$d of %2$d items using %3$s.', 'arva-seo' ),
+				__( 'Processed %1$d of %2$d items using %3$s.', 'bulk-meta-editor' ),
 				(int) $summary['processed'],
 				(int) $summary['total'],
 				$summary['provider']

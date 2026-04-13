@@ -55,16 +55,16 @@ class Licensing {
 	public function get_provider_upgrade_message( string $provider_name ): string {
 		return sprintf(
 			/* translator: %s: SEO provider name */
-			__( '%s support is available in ArvaSEO Premium. The free version includes Yoast SEO support only.', 'arva-seo' ),
+			__( '%s support is available in ArvaSEO Premium. The free version includes Yoast SEO support only.', 'bulk-meta-editor' ),
 			$provider_name
 		);
 	}
 
 	public function get_crawl_upgrade_message(): string {
-		return __( 'The Crawl workspace is a premium feature. Upgrade to unlock full-site crawling, exports, and recrawling workflows.', 'arva-seo' );
+		return __( 'The Crawl workspace is a premium feature. Upgrade to unlock full-site crawling, exports, and recrawling workflows.', 'bulk-meta-editor' );
 	}
 
 	public function get_woocommerce_upgrade_message(): string {
-		return __( 'WooCommerce product crawling is a premium feature. Upgrade to include product SEO data in your crawl dataset.', 'arva-seo' );
+		return __( 'WooCommerce product crawling is a premium feature. Upgrade to include product SEO data in your crawl dataset.', 'bulk-meta-editor' );
 	}
 }

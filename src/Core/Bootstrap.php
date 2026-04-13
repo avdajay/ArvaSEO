@@ -91,7 +91,7 @@ class Bootstrap {
 		if ( defined( 'ARVA_SEO_VERSION' ) ) {
 			$this->version = ARVA_SEO_VERSION;
 		} else {
-			$this->version = '2.0.0';
+			$this->version = '2.0.1';
 		}
 		$this->plugin_name = 'arva-seo';
 

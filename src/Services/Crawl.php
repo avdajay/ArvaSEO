@@ -350,7 +350,7 @@ class Crawl {
 				}
 
 				$source = trim( (string) $image->getAttribute( 'src' ) );
-				$missing_image_alts[] = '' !== $source ? $source : __( 'Image source unavailable', 'arva-seo' );
+				$missing_image_alts[] = '' !== $source ? $source : __( 'Image source unavailable', 'bulk-meta-editor' );
 			}
 		}
 

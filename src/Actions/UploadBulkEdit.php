@@ -22,7 +22,7 @@ class UploadBulkEdit {
 
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to upload bulk edit files.', 'arva-seo' ) );
+			wp_die( esc_html__( 'You are not allowed to upload bulk edit files.', 'bulk-meta-editor' ) );
 		}
 
 		check_admin_referer( 'arva_seo_upload_bulk_edit', 'arva_seo_upload_nonce' );

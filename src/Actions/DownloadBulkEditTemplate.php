@@ -6,7 +6,7 @@ class DownloadBulkEditTemplate {
 
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to download the bulk edit template.', 'arva-seo' ) );
+			wp_die( esc_html__( 'You are not allowed to download the bulk edit template.', 'bulk-meta-editor' ) );
 		}
 
 		check_admin_referer( 'arva_seo_download_bulk_edit_template', 'arva_seo_template_nonce' );
@@ -20,7 +20,7 @@ class DownloadBulkEditTemplate {
 		$output = fopen( 'php://output', 'w' );
 
 		if ( false === $output ) {
-			wp_die( esc_html__( 'Unable to generate the template file.', 'arva-seo' ) );
+			wp_die( esc_html__( 'Unable to generate the template file.', 'bulk-meta-editor' ) );
 		}
 
 		fputcsv(

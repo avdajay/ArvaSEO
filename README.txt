@@ -1,11 +1,11 @@
-=== Arva SEO ===
+=== Arva SEO (formerly Bulk Meta Editor) ===
 Contributors: avdajay
 Donate link: https://paypal.me/geekyaries
 Tags: arva seo, seo, bulk seo editor, bulk seo meta editor, bulk seo meta update
 Requires at least: 6.6
 Requires PHP: 8.2
 Tested up to: 6.9
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,8 +52,8 @@ Yes, please send us an email directly at the Contact Us screen.
 
 == Changelog ==
 
-= 2.0.0 =
-* Initial version release.
+= 2.0.1 =
+* Optimized support for Internationalization
 
 == Upgrade Notice ==
 

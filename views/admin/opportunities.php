@@ -1,22 +1,22 @@
 <div class="arva-seo-wrapper">
     <div class="arva-seo-opportunities-hero">
         <div>
-            <h1 class="arva-seo-text-dark"><?php esc_html_e( 'Opportunities', 'arva-seo' ); ?></h1>
-            <p class="arva-seo-summary-meta"><?php esc_html_e( 'Track the site-wide SEO score and focus on the pages that need the most attention.', 'arva-seo' ); ?></p>
+            <h1 class="arva-seo-text-dark"><?php esc_html_e( 'Opportunities', 'bulk-meta-editor' ); ?></h1>
+            <p class="arva-seo-summary-meta"><?php esc_html_e( 'Track the site-wide SEO score and focus on the pages that need the most attention.', 'bulk-meta-editor' ); ?></p>
         </div>
-        <a class="arva-seo-btn-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=arva-seo-crawl' ) ); ?>"><?php esc_html_e( 'Go To Crawl', 'arva-seo' ); ?></a>
+        <a class="arva-seo-btn-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=arva-seo-crawl' ) ); ?>"><?php esc_html_e( 'Go To Crawl', 'bulk-meta-editor' ); ?></a>
     </div>
 
 	<?php if ( $provider_requires_premium ) : ?>
         <div class="arva-seo-inline-upsell arva-seo-rounded">
             <p><?php echo esc_html( $provider_upgrade_message ); ?></p>
-            <a class="arva-seo-btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Upgrade To Premium', 'arva-seo' ); ?></a>
+            <a class="arva-seo-btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Upgrade To Premium', 'bulk-meta-editor' ); ?></a>
         </div>
 	<?php endif; ?>
 
     <div class="arva-seo-opportunities-grid">
         <div class="arva-seo-op-card arva-seo-bg-lighter arva-seo-rounded">
-            <span class="arva-seo-summary-label"><?php esc_html_e( 'Overall SEO Score', 'arva-seo' ); ?></span>
+            <span class="arva-seo-summary-label"><?php esc_html_e( 'Overall SEO Score', 'bulk-meta-editor' ); ?></span>
             <div class="arva-seo-op-score-ring" style="--progress: <?php echo esc_attr( $dashboard['average_score'] ); ?>;">
                 <span><?php echo esc_html( $dashboard['average_score'] ); ?></span>
             </div>
@@ -24,7 +24,7 @@
 				<?php
 				printf(
 					/* translator: %d: number of crawled pages included in the score */
-					esc_html__( '%d crawled pages included in this score.', 'arva-seo' ),
+					esc_html__( '%d crawled pages included in this score.', 'bulk-meta-editor' ),
 					(int) $dashboard['total_pages']
 				);
 				?>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="arva-seo-op-card arva-seo-bg-lighter arva-seo-rounded">
-            <span class="arva-seo-summary-label"><?php esc_html_e( 'Score Distribution', 'arva-seo' ); ?></span>
+            <span class="arva-seo-summary-label"><?php esc_html_e( 'Score Distribution', 'bulk-meta-editor' ); ?></span>
             <div class="arva-seo-op-bars">
 				<?php foreach ( $dashboard['score_bands'] as $band => $count ) : ?>
 					<?php
@@ -52,8 +52,8 @@
 
     <div class="arva-seo-opportunities-list">
         <div class="arva-seo-opportunities-list-header">
-            <h2 class="arva-seo-text-dark"><?php esc_html_e( 'Optimization Opportunities', 'arva-seo' ); ?></h2>
-            <p class="arva-seo-summary-meta"><?php esc_html_e( 'Click an opportunity to inspect the affected pages on this same screen.', 'arva-seo' ); ?></p>
+            <h2 class="arva-seo-text-dark"><?php esc_html_e( 'Optimization Opportunities', 'bulk-meta-editor' ); ?></h2>
+            <p class="arva-seo-summary-meta"><?php esc_html_e( 'Click an opportunity to inspect the affected pages on this same screen.', 'bulk-meta-editor' ); ?></p>
         </div>
         <div class="arva-seo-opportunity-cards">
 			<?php foreach ( $dashboard['opportunities'] as $key => $opportunity ) : ?>
@@ -70,24 +70,24 @@
         <div class="arva-seo-opportunity-detail arva-seo-bg-lighter arva-seo-rounded">
             <div class="arva-seo-opportunities-list-header">
                 <div>
-                    <h2 class="arva-seo-text-dark"><?php echo esc_html( $dashboard['opportunities'][ $selected_opportunity ]['label'] ?? __( 'Opportunity Detail', 'arva-seo' ) ); ?></h2>
+                    <h2 class="arva-seo-text-dark"><?php echo esc_html( $dashboard['opportunities'][ $selected_opportunity ]['label'] ?? __( 'Opportunity Detail', 'bulk-meta-editor' ) ); ?></h2>
                     <p class="arva-seo-summary-meta">
 						<?php
 						printf(
 							/* translator: %d: number of affected pages */
-							esc_html__( '%d affected pages found.', 'arva-seo' ),
+							esc_html__( '%d affected pages found.', 'bulk-meta-editor' ),
 							(int) $opportunity_total
 						);
 						?>
                     </p>
                 </div>
-                <a class="arva-seo-search-reset" href="<?php echo esc_url( admin_url( 'admin.php?page=arva-seo' ) ); ?>"><?php esc_html_e( 'Back To Overview', 'arva-seo' ); ?></a>
+                <a class="arva-seo-search-reset" href="<?php echo esc_url( admin_url( 'admin.php?page=arva-seo' ) ); ?>"><?php esc_html_e( 'Back To Overview', 'bulk-meta-editor' ); ?></a>
             </div>
             <div class="arva-seo-opportunity-detail-table">
                 <div class="arva-seo-opportunity-detail-head">
-                    <div><?php esc_html_e( 'Page', 'arva-seo' ); ?></div>
-                    <div><?php esc_html_e( 'Current Value', 'arva-seo' ); ?></div>
-                    <div><?php esc_html_e( 'Score', 'arva-seo' ); ?></div>
+                    <div><?php esc_html_e( 'Page', 'bulk-meta-editor' ); ?></div>
+                    <div><?php esc_html_e( 'Current Value', 'bulk-meta-editor' ); ?></div>
+                    <div><?php esc_html_e( 'Score', 'bulk-meta-editor' ); ?></div>
                 </div>
 				<?php foreach ( $opportunity_items as $item ) : ?>
                     <div class="arva-seo-opportunity-detail-row">
@@ -107,19 +107,19 @@
 								$current_value = [] !== $image_values
 									? sprintf(
 										/* translator: 1: number of images missing alt text, 2: list of image sources */
-										__( '%1$d missing alt image(s): %2$s', 'arva-seo' ),
+										__( '%1$d missing alt image(s): %2$s', 'bulk-meta-editor' ),
 										(int) ( $item['missing_image_alt_count'] ?? 0 ),
 										implode( ' | ', $image_values )
 									)
-									: __( 'No missing image alt text found', 'arva-seo' );
+									: __( 'No missing image alt text found', 'bulk-meta-editor' );
 							} else {
 								$h1_values = json_decode( (string) ( $item['h1_texts'] ?? '' ), true );
 								$h1_values = is_array( $h1_values ) ? array_filter( array_map( 'strval', $h1_values ) ) : [];
 								$current_value = [] !== $h1_values
 									? implode( ' | ', $h1_values )
-									: __( 'No H1 found', 'arva-seo' );
+									: __( 'No H1 found', 'bulk-meta-editor' );
 							}
-							echo esc_html( '' !== $current_value ? $current_value : __( 'Not set', 'arva-seo' ) );
+							echo esc_html( '' !== $current_value ? $current_value : __( 'Not set', 'bulk-meta-editor' ) );
 							?>
                         </div>
                         <div>
@@ -145,8 +145,8 @@
 								'format' => '',
 								'current' => $opportunity_page,
 								'total' => $opportunity_total_pages,
-								'prev_text' => __( 'Previous', 'arva-seo' ),
-								'next_text' => __( 'Next', 'arva-seo' ),
+								'prev_text' => __( 'Previous', 'bulk-meta-editor' ),
+								'next_text' => __( 'Next', 'bulk-meta-editor' ),
 							]
 						)
 					);

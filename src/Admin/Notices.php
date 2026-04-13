@@ -37,7 +37,7 @@ class Notices {
 		}
 
 		echo '<div class="notice notice-success is-dismissible"><p>' .
-			esc_html__( 'Crawl completed successfully.', 'arva-seo' ) .
+			esc_html__( 'Crawl completed successfully.', 'bulk-meta-editor' ) .
 			'</p></div>';
 	}
 
